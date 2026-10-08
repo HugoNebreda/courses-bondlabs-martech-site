@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RunNorte: tienda ficticia de running y outdoor para una compra de demostración.">
+  <title>Pago · RunNorte</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/config.js"></script>
+  <script defer src="js/run.js"></script>
+  <script defer src="js/collector.js"></script>
+  <script defer src="js/tracking.js"></script>
+  <script defer src="js/catalog.js"></script>
+  <script defer src="js/cart.js"></script>
+  <script defer src="js/order.js"></script>
+  <script defer src="js/checkout.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body data-page="checkout">
+  <a class="skip-link" href="#page-content">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">↗</span><span id="store-name">RunNorte</span></a>
+      <nav aria-label="Navegación principal">
+        <span class="badge">V2 · COLLECT</span>
+        <a class="catalog-nav" href="index.html">Colección</a>
+        <a href="cart.html">Carrito <span id="cart-count" class="cart-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+  <div class="measurement-note"><span>Ejercicio <code id="run-id"></code> · Código de esta pestaña, no de una persona.</span><small id="collector-status" role="status">Collector sin configurar.</small></div>
+  <main id="page-content"><p role="status">Cargando…</p></main>
+  <noscript><p>Esta tienda necesita JavaScript para cargar el catálogo y gestionar la compra de demostración.</p></noscript>
+  <footer class="site-footer">
+    <p>RunNorte · Encuentra tu ritmo.</p>
+    <p>Tienda ficticia para aprender. Productos y compras de demostración.</p>
+  </footer>
+</body>
+</html>

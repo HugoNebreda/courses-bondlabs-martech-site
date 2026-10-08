@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="RunNorte: tienda ficticia de running y outdoor para una compra de demostración.">
+  <title>Colección · RunNorte</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="css/style.css">
+  <script defer src="js/config.js"></script>
+  <script defer src="js/run.js"></script>
+  <script defer src="js/consent.js"></script>
+  <script defer src="js/collector.js"></script>
+  <script defer src="js/tms.js"></script>
+  <script defer src="js/tracking.js"></script>
+  <script defer src="js/catalog.js"></script>
+  <script defer src="js/cart.js"></script>
+  <script defer src="js/order.js"></script>
+  <script defer src="js/checkout.js"></script>
+  <script defer src="js/app.js"></script>
+</head>
+<body data-page="catalog">
+  <a class="skip-link" href="#page-content">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">↗</span><span id="store-name">RunNorte</span></a>
+      <nav aria-label="Navegación principal">
+        <span class="badge">V4 · CONNECT</span>
+        <a class="catalog-nav" href="index.html">Colección</a>
+        <a href="cart.html">Carrito <span id="cart-count" class="cart-count">0</span></a>
+      </nav>
+    </div>
+  </header>
+  <aside class="measurement-note" aria-label="Contexto anónimo y privacidad">
+    <div class="identity-context">
+      <span>run_id: <code id="run-id"></code> · Ejercicio de esta pestaña, no de una persona.</span>
+      <span>session_id: <code id="session-id">null</code> · Sesión anónima.</span>
+      <span>visitor_id: <code id="visitor-id">null</code> · Navegador anónimo.</span>
+      <span>user_id: <code>null</code> · Persona conocida: NO.</span>
+    </div>
+    <div><span>Analítica opcional: <strong id="consent-state">unset</strong></span>
+      <button class="text-button" id="privacy-open" type="button">Preferencias de privacidad</button></div>
+    <section id="privacy-preferences" aria-label="Preferencias de privacidad" hidden>
+      <p>Puedes comprar con o sin analítica opcional. Aceptar permite recordar un contexto anónimo del navegador.</p>
+      <button class="button" id="analytics-grant" type="button">Aceptar analítica opcional</button>
+      <button class="text-button" id="analytics-deny" type="button">Rechazar / retirar analítica</button>
+      <button class="text-button" id="privacy-close" type="button">Cerrar preferencias</button>
+      <small>Control educativo de permiso y estado; no es asesoramiento legal ni una CMP de producción.</small>
+    </section>
+    <small id="collector-status" role="status">Collector sin configurar.</small>
+  </aside>
+  <details class="measurement-note">
+    <summary>Tag Management System · rutas y destinos de medición</summary>
+    <p>web → dataLayer → Tag Management System → collector / Digital Analytics</p>
+    <label><input id="duplicate-measurement" type="checkbox"> Demo: compra medida por vía directa + TMS (dos mediciones, un pedido)</label>
+    <p>¿Hemos vendido el doble? No: compara transaction_id con el pedido operativo. El destino Digital Analytics es local; el collector muestra intentos, no recepción confirmada.</p>
+    <pre id="measurement-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>
+  </details>
+  <main id="page-content"><p role="status">Cargando…</p></main>
+  <noscript><p>Esta tienda necesita JavaScript para cargar el catálogo y gestionar la compra de demostración.</p></noscript>
+  <footer class="site-footer">
+    <p>RunNorte · Encuentra tu ritmo.</p>
+    <p>Tienda ficticia para aprender. Productos y compras de demostración.</p>
+  </footer>
+</body>
+</html>

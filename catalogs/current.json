@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "store": { "id": "runnorte", "name": "RunNorte", "currency": "EUR", "locale": "es-ES" },
+  "categories": [
+    { "id": "road", "name": "Running" },
+    { "id": "trail", "name": "Trail" },
+    { "id": "equipment", "name": "Equipamiento" }
+  ],
+  "products": [
+    { "id": "sku-001", "slug": "carbon-pro", "name": "Carbon Pro", "brand": "Norte", "category": "road", "price": 179, "description": "Zapatilla ligera para tus días rápidos. Amortiguación reactiva y una pisada cómoda para sumar kilómetros sobre asfalto.", "image": "assets/products/carbon-pro.svg", "teaching_roles": ["premium"] },
+    { "id": "sku-002", "slug": "ritmo-daily", "name": "Ritmo Daily", "brand": "Norte", "category": "road", "price": 89, "description": "Tu compañera de entrenamiento diario. Suela flexible y tejido transpirable para correr a tu ritmo.", "image": "assets/products/ritmo-daily.svg", "teaching_roles": [] },
+    { "id": "sku-003", "slug": "sierra-grip", "name": "Sierra Grip", "brand": "Cumbre", "category": "trail", "price": 119, "description": "Agarre para senderos y caminos de montaña. Protección ligera para explorar un poco más lejos.", "image": "assets/products/sierra-grip.svg", "teaching_roles": [] },
+    { "id": "sku-004", "slug": "brisa-tee", "name": "Brisa Tee", "brand": "Vento", "category": "road", "price": 29, "description": "Camiseta suave y ligera de secado rápido. Un básico cómodo para cada salida.", "image": "assets/products/brisa-tee.svg", "teaching_roles": [] },
+    { "id": "sku-005", "slug": "cortavientos-horizonte", "name": "Cortavientos Horizonte", "brand": "Cumbre", "category": "trail", "price": 69, "description": "Una capa ligera para días de viento. Se pliega fácilmente para acompañarte en tus rutas.", "image": "assets/products/cortavientos-horizonte.svg", "teaching_roles": [] },
+    { "id": "sku-006", "slug": "chaleco-ruta", "name": "Chaleco Ruta", "brand": "Cumbre", "category": "trail", "price": 79, "description": "Lleva lo esencial cerca. Bolsillos accesibles y ajuste cómodo para salidas largas.", "image": "assets/products/chaleco-ruta.svg", "teaching_roles": [] },
+    { "id": "sku-007", "slug": "botella-loop", "name": "Botella Loop", "brand": "Vento", "category": "equipment", "price": 15, "description": "Botella reutilizable de 500 ml con cierre sencillo. Para entrenar, caminar y seguir en movimiento.", "image": "assets/products/botella-loop.svg", "teaching_roles": [] },
+    { "id": "sku-008", "slug": "calcetines-paso", "name": "Calcetines Paso", "brand": "Norte", "category": "equipment", "price": 12, "description": "Un par de calcetines con refuerzo suave y tejido transpirable para cuidar cada paso.", "image": "assets/products/calcetines-paso.svg", "teaching_roles": [] }
+  ]
+}
