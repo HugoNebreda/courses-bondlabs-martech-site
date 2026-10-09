@@ -79,7 +79,7 @@ function refreshActivation() {
     activationScript = document.createElement("script");
     activationScript.src = url.href;
     activationScript.onerror = () => liveFailure("live_error_standard");
-    activationTimer = setTimeout(() => liveFailure("live_timeout_standard"), 1500);
+    activationTimer = setTimeout(() => liveFailure("live_timeout_standard"), 5000);
     document.head.appendChild(activationScript);
   } catch (error) { liveFailure("live_error_standard"); }
 }
