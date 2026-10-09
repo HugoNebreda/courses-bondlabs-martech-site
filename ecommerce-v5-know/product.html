@@ -18,6 +18,10 @@
   <script defer src="js/cart.js"></script>
   <script defer src="js/order.js"></script>
   <script defer src="js/checkout.js"></script>
+  <!-- T009 classroom scripts start -->
+  <script defer src="js/classroom-config.js"></script>
+  <script defer src="js/classroom.js"></script>
+  <!-- T009 classroom scripts end -->
   <script defer src="js/app.js"></script>
 </head>
 <body data-page="product">
@@ -68,6 +72,9 @@
     <p>Reglas de demo: carrito observado pendiente → cart_abandoner; interés observado en categoría road → running_interest; compras observadas por transaction_id ≥ 200 EUR → high_value. Perfiles anónimos también pueden pertenecer a audiencias.</p>
     <pre id="profile-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>
   </details>
+  <!-- T009 trace control start -->
+  <aside class="measurement-note" aria-label="Herramienta docente"><label><input id="teaching-trace" type="checkbox"> Traza docente</label> <small>Salida pedagógica en Console; no es medición. OFF por defecto. También ?trace=1.</small></aside>
+  <!-- T009 trace control end -->
   <main id="page-content"><p role="status">Cargando…</p></main>
   <noscript><p>Esta tienda necesita JavaScript para cargar el catálogo y gestionar la compra de demostración.</p></noscript>
   <footer class="site-footer">

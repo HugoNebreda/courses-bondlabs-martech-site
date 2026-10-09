@@ -16,6 +16,10 @@
   <script defer src="js/cart.js"></script>
   <script defer src="js/order.js"></script>
   <script defer src="js/checkout.js"></script>
+  <!-- T009 classroom scripts start -->
+  <script defer src="js/classroom-config.js"></script>
+  <script defer src="js/classroom.js"></script>
+  <!-- T009 classroom scripts end -->
   <script defer src="js/app.js"></script>
 </head>
 <body data-page="confirmation">
@@ -48,6 +52,9 @@
     </section>
     <small id="collector-status" role="status">Collector sin configurar.</small>
   </aside>
+  <!-- T009 trace control start -->
+  <aside class="measurement-note" aria-label="Herramienta docente"><label><input id="teaching-trace" type="checkbox"> Traza docente</label> <small>Salida pedagógica en Console; no es medición. OFF por defecto. También ?trace=1.</small></aside>
+  <!-- T009 trace control end -->
   <main id="page-content"><p role="status">Cargando…</p></main>
   <noscript><p>Esta tienda necesita JavaScript para cargar el catálogo y gestionar la compra de demostración.</p></noscript>
   <footer class="site-footer">
