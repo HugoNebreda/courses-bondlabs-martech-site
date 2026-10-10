@@ -147,10 +147,14 @@ refreshActivation = function () {
 };
 const originalRenderActivation = renderActivation;
 renderActivation = function () {
-  teachingTrace("DECISION", "Consulta explícita: " + window.activationDebug.source + ".", {
-    request_id: window.activationDebug.input?.request_id, decision_id: window.activationDebug.decision?.decision_id });
+  const debug = window.activationDebug;
+  const identifiers = { request_id: debug.input?.request_id, surface: debug.input?.surface,
+    audiences: debug.input?.audiences, decision_id: debug.decision?.decision_id,
+    action: debug.decision?.action, eligible: debug.decision?.eligible, source: debug.source, variant: debug.variant };
+  teachingTrace(debug.source === "pending" ? "DECISION REQUEST" : "DECISION RESPONSE",
+    "Consulta explícita: " + debug.source + ".", identifiers);
   const result = originalRenderActivation();
-  teachingTrace("EXPERIENCE", "Experiencia resultante: " + window.activationDebug.variant + ".");
+  teachingTrace("EXPERIENCE", "Experiencia resultante: " + debug.variant + ".", identifiers);
   return result;
 };
 

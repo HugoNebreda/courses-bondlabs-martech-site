@@ -6,20 +6,56 @@ let activationSequence = 0;
 let activationRequest = null;
 let activationScript = null;
 let activationTimer = null;
+let celebrationTimer = null;
+
+function activationSurface() {
+  const page = document.body.dataset.page;
+  if (page === "catalog") return "home";
+  if (page === "cart") return "cart";
+  if (page === "confirmation" && typeof readOrder === "function" && readOrder()) return "confirmation";
+  return null;
+}
+
+function compatibleActivation(action, input) {
+  if (!input) return false;
+  if (action === "running_interest_home") return input.surface === "home" && input.audiences.includes("running_interest");
+  if (action === "cart_recovery_reminder") return ["home", "cart"].includes(input.surface) && input.audiences.includes("cart_abandoner");
+  if (action === "loyalty_thank_you") return input.surface === "confirmation" && input.audiences.includes("high_value");
+  return false;
+}
 
 function activationInput() {
   // Consume the profile/audience projection; never segment raw events here.
   if (readAnalyticsConsent() !== "granted") return null;
   const identity = analyticsIdentity();
   if (!identity) return null;
+  const surface = activationSurface();
+  if (!surface) return null;
   const key = identity.user_id || identity.visitor_id;
   const membership = readProfileModel().AUDIENCES.find(row => row.profile_key === key);
-  return { profile_key: key, audiences: membership ? membership.audiences.slice() : [] };
+  if (membership && !membership.audiences.every(label => ["cart_abandoner", "running_interest", "high_value"].includes(label))) return null;
+  return { profile_key: key, surface, audiences: membership ? membership.audiences.slice() : [] };
 }
 
 function renderActivation() {
   const offer = document.getElementById("activation-offer");
   if (offer) offer.hidden = window.activationDebug.variant !== "cart_recovery_reminder";
+  const running = document.getElementById("activation-running");
+  if (running) running.hidden = window.activationDebug.variant !== "running_interest_home";
+  const loyalty = document.getElementById("activation-loyalty");
+  if (loyalty) {
+    const wasHidden = loyalty.hidden;
+    loyalty.hidden = window.activationDebug.variant !== "loyalty_thank_you";
+    const confetti = document.getElementById("activation-confetti");
+    if (confetti && (loyalty.hidden || wasHidden)) {
+      clearTimeout(celebrationTimer);
+      confetti.hidden = true;
+      if (!loyalty.hidden && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        confetti.hidden = false;
+        celebrationTimer = setTimeout(() => { confetti.hidden = true; }, 2600);
+      }
+    }
+  }
   const surface = document.getElementById("activation-debug");
   if (surface) surface.textContent = JSON.stringify(window.activationDebug, null, 2);
 }
@@ -28,15 +64,15 @@ function finishActivation(decision, source) {
   if (!activationRequest || activationRequest.finished) return;
   if (readAnalyticsConsent() !== "granted") return;
   if (!decision || decision.request_id !== activationRequest.input.request_id ||
-      typeof decision.eligible !== "boolean" ||
-      (decision.action !== null && decision.action !== "cart_recovery_reminder")) return;
+      decision.surface !== activationRequest.input.surface || typeof decision.eligible !== "boolean" ||
+      (decision.eligible && !/^decision_[a-z0-9_]+$/.test(decision.decision_id || "")) ||
+      (decision.action !== null && !compatibleActivation(decision.action, activationRequest.input))) return;
   if (JSON.stringify(activationInput()) !== activationRequest.signature) return;
   activationRequest.finished = true;
   clearTimeout(activationTimer);
   window.activationDebug.decision = JSON.parse(JSON.stringify(decision));
   window.activationDebug.source = source;
-  window.activationDebug.variant = decision.eligible && decision.action === "cart_recovery_reminder" ?
-    "cart_recovery_reminder" : "standard";
+  window.activationDebug.variant = decision.eligible && compatibleActivation(decision.action, activationRequest.input) ? decision.action : "standard";
   renderActivation();
 }
 
@@ -74,6 +110,7 @@ function refreshActivation() {
     if (!["https:", "http:"].includes(url.protocol)) throw new Error("Invalid decision URL");
     url.searchParams.set("operation", "activation");
     url.searchParams.set("request_id", requestId);
+    url.searchParams.set("surface", input.surface);
     // Only consented audience labels go to decisioning, no raw events or identity.
     url.searchParams.set("audiences", input.audiences.join(","));
     activationScript = document.createElement("script");

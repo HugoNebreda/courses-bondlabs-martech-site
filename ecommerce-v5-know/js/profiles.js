@@ -1,7 +1,12 @@
 "use strict";
 
 // Synthetic fixtures, not authentication credentials or a production identity graph.
-const DEMO_ACCOUNTS = { club_norte: { user_id: "u_204", code: "204204" } };
+const DEMO_ACCOUNTS = {
+  club_norte: { user_id: "u_204", code: "204204" },
+  club_sur: { user_id: "u_305", code: "305305" },
+  club_este: { user_id: "u_418", code: "418418" },
+  club_oeste: { user_id: "u_527", code: "527527" }
+};
 const MODEL_KEY = "mt_v5_model";
 function emptyProfileModel() { return { RAW_EVENTS: [], IDENTITY_LINKS: [], PROFILES: [], AUDIENCES: [] }; }
 function readProfileModel() {
@@ -63,10 +68,12 @@ function knownAnalyticsUser(visitorId) {
 }
 function linkDemoAccount(alias, code) {
   const account = DEMO_ACCOUNTS[alias];
-  if (!account || code !== account.code) return { ok: false, message: "Alias o código ficticio incorrecto." };
+  if (!Object.hasOwn(DEMO_ACCOUNTS, alias) || code !== account.code) return { ok: false, message: "Alias o código ficticio incorrecto." };
   const identity = analyticsIdentity();
   if (!identity) return { ok: false, message: "El enlace analítico requiere permiso y almacenamiento. Puedes comprar como invitado." };
   const model = readProfileModel();
+  const existing = model.IDENTITY_LINKS.find(link => link.visitor_id === identity.visitor_id);
+  if (existing && existing.user_id !== account.user_id) return { ok: false, message: "Este contexto ya pertenece a otra cuenta sintética. Retira y vuelve a aceptar el permiso para cambiar de grupo." };
   if (!model.IDENTITY_LINKS.some(link => link.visitor_id === identity.visitor_id)) {
     model.IDENTITY_LINKS.push({ visitor_id: identity.visitor_id, user_id: account.user_id,
       link_reason: "authenticated_session", evidence: "synthetic_code_validated",

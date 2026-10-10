@@ -25,6 +25,13 @@
   <script defer src="js/classroom.js"></script>
   <!-- T009 classroom scripts end -->
   <script defer src="js/app.js"></script>
+  <!-- T009 guide start -->
+  <link rel="stylesheet" href="css/how-to.css">
+  <script defer src="js/how-to.js"></script>
+  <!-- T009 guide end -->
+  <!-- T009 activation surfaces start -->
+  <link rel="stylesheet" href="css/activation.css">
+  <!-- T009 activation surfaces end -->
 </head>
 <body data-page="confirmation">
   <a class="skip-link" href="#page-content">Saltar al contenido</a>
@@ -65,19 +72,28 @@
   </details>
   <details class="measurement-note">
     <summary>Club ficticio · enlace de identidad, perfiles y audiencias</summary>
+  <!-- T009 accounts start -->
+    <p>Cuentas sintéticas de aula (una por grupo): club_norte / 204204 → u_204; club_sur / 305305 → u_305; club_este / 418418 → u_418; club_oeste / 527527 → u_527. No son cuentas reales. Para cambiar de grupo, retira y vuelve a aceptar el permiso.</p>
+  <!-- T009 accounts end -->
     <p>Demo: alias club_norte y código 204204. Datos sintéticos; no introduzcas datos personales.</p>
     <form id="demo-signin"><label>Alias ficticio <input id="demo-alias" value="club_norte" autocomplete="off"></label>
       <label>Código ficticio <input id="demo-code" inputmode="numeric" autocomplete="off"></label>
       <button class="button" type="submit">Validar enlace demo</button></form>
     <p id="signin-status" role="status"></p>
     <p>RAW_EVENTS + IDENTITY_LINKS → PROFILES → AUDIENCES. La ausencia de una compra observada no demuestra que no se compró.</p>
-    <p>Reglas de demo: carrito observado pendiente → cart_abandoner; interés observado en categoría road → running_interest; compras observadas por transaction_id ≥ 200 EUR → high_value. Perfiles anónimos también pueden pertenecer a audiencias.</p>
+    <p>Reglas de demo: carrito observado pendiente → cart_abandoner; interés observado en categoría road → running_interest; compras observadas ≥ 300 EUR o tres transaction_id únicos → high_value. Perfiles anónimos también pueden pertenecer a audiencias.</p>
     <pre id="profile-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>
   </details>
   <section id="activation-offer" class="measurement-note" aria-label="Recordatorio de carrito" hidden>
     <strong>Tu carrito te espera.</strong> Retoma tu próxima salida.
     <a class="button" href="cart.html">Retomar mi carrito →</a>
   </section>
+  <!-- T009 activation surfaces start -->
+  <section id="activation-loyalty" class="measurement-note" aria-label="Reconocimiento tras la compra" hidden>
+    <strong>Gracias por seguir corriendo con nosotros.</strong> Celebramos tus compras observadas, sin descuentos.
+    <div id="activation-confetti" aria-hidden="true" hidden><span style="--piece:0"></span><span style="--piece:1"></span><span style="--piece:2"></span><span style="--piece:3"></span><span style="--piece:4"></span><span style="--piece:5"></span><span style="--piece:6"></span><span style="--piece:7"></span><span style="--piece:8"></span><span style="--piece:9"></span><span style="--piece:10"></span><span style="--piece:11"></span></div>
+  </section>
+  <!-- T009 activation surfaces end -->
   <details class="measurement-note"><summary>Activación · audiencia → decisión → experiencia → nueva señal</summary>
     <p>El recordatorio cambia la experiencia; no altera precios ni pedidos. Sin permiso/contexto o decisión: experiencia estándar.</p>
     <pre id="activation-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>

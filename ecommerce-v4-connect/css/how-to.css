@@ -1,0 +1,8 @@
+.how-to-open { display: block; margin: .3rem auto .7rem; padding: .35rem .6rem; border: 0; background: transparent; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
+.how-to-dialog { width: min(38rem, 90vw); max-height: 85vh; overflow: auto; padding: 1.5rem; border: 1px solid #c9d1cd; border-radius: .7rem; color: #18322a; background: #fff; }
+.how-to-dialog::backdrop { background: rgb(15 35 28 / .4); }
+.how-to-dialog h2 { font-size: 1.3rem; }
+.how-to-dialog h3 { font-size: 1rem; }
+.how-to-dialog li { margin-bottom: .45rem; line-height: 1.5; }
+.how-to-dialog button { font: inherit; padding: .5rem .8rem; cursor: pointer; }
+.how-to-open:focus-visible, .how-to-dialog button:focus-visible { outline: 3px solid #167a5b; outline-offset: 3px; }

@@ -1,0 +1,8 @@
+#activation-running { border-left: .3rem solid #167a5b; }
+#activation-loyalty { position: relative; border: 2px solid #aa822d; background: #fff8e5; padding: 1.3rem; border-radius: .7rem; }
+#activation-loyalty strong { font-size: 1.2rem; }
+#activation-confetti { position: absolute; inset: 0; overflow: hidden; pointer-events: none; }
+#activation-confetti span { position: absolute; top: -1rem; left: calc(var(--piece) * 8%); width: .45rem; height: .8rem; background: #167a5b; animation: classroom-confetti 2.5s ease-out 1 forwards; }
+#activation-confetti span:nth-child(even) { background: #aa822d; }
+@keyframes classroom-confetti { from { transform: translateY(0) rotate(0); opacity: 1; } to { transform: translateY(12rem) rotate(240deg); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { #activation-confetti { display: none; } #activation-confetti span { animation: none; } }

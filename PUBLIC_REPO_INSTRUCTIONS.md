@@ -43,7 +43,7 @@ Report the final Pages URL and any publication-only change required.
 ## T-009 classroom refresh
 
 This export includes an optional **Traza docente** Console toggle in V2–V6 and
-local `js/classroom-config.js` copies. V1 remains unchanged. The same public /exec
+local `js/classroom-config.js` copies. V1 has only contextual help, no trace/tracking. The same public /exec
 URL, when provisioned/configured in the private source, serves all collectors and
 V6 activation. Empty configuration runs offline with the V6 static snapshot.
 Do not insert credentials or configure five separate services in this artifact.
@@ -60,3 +60,13 @@ health check passed on 2026-10-09, but actual published-site/Sheet smoke is pend
 Copy the complete artifact, publish and report the actual Pages URL and commit.
 Preserve the supplied configuration and distinguish health from received event
 rows. CLASSROOM_READY still requires the remaining end-to-end evidence.
+
+This refresh also contains local “Cómo probar esta versión” dialogs in V1–V6,
+four synthetic groups in V5/V6 and V6 home/cart/confirmation activation.
+The real /exec URL is unchanged. **The teacher must update all four canonical
+classroom .gs files, run setupClassroom and redeploy a new version of the existing
+Web App before publication.** The four-column decision Sheet is preserved; setup
+adds missing decision IDs without overwriting teacher edits. The new read contract
+requires surface and echoes it in the callback. An old deployment stays standard.
+This artifact cannot update Google. Report pending final human smoke, including
+group isolation and live surface decisions; never claim CLASSROOM_READY here.
