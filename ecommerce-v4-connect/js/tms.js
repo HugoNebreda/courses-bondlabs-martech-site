@@ -9,7 +9,8 @@ const TMS_EVENTS = ["view_item_list", "select_item", "view_item", "add_to_cart",
   "view_cart", "remove_from_cart", "begin_checkout", "purchase"];
 const TMS_RULES = {
   collector: TMS_EVENTS,
-  digitalAnalytics: TMS_EVENTS
+  digitalAnalytics: TMS_EVENTS,
+  adsConversion: ["purchase"]
 };
 
 function duplicateMeasurementEnabled() {
@@ -18,8 +19,18 @@ function duplicateMeasurementEnabled() {
 }
 
 function sendDigitalAnalytics(event) {
-  // Local Digital Analytics adapter: no SDK, account or remote service required.
+  // Simulated HTTP destinations, static receipts on this same site; no vendor account.
   window.analyticsDebug.push(JSON.parse(JSON.stringify(event)));
+  sendDemoReceipt("analytics", { name: event.event_name, event: event.event_id, revenue: event.ecommerce.value, currency: event.ecommerce.currency });
+}
+
+function sendDemoReceipt(destination, parameters) {
+  const url = new URL("demo-sinks/" + destination + ".json", location.href);
+  for (const [key, value] of Object.entries(parameters)) if (value !== null && value !== undefined) url.searchParams.set(key, String(value));
+  fetch(url.href, { credentials: "omit", cache: "no-store" }).catch(() => {});
+}
+function sendAdsConversion(event) {
+  sendDemoReceipt("ads", { conversion: "purchase", event: event.event_id, transaction: event.ecommerce.transaction_id, acquisition: "exclude_converted_demo" });
 }
 
 function routeMeasurement(event) {
@@ -32,6 +43,7 @@ function routeMeasurement(event) {
     try {
       if (destination === "collector") sendToCollector("event", event);
       if (destination === "digitalAnalytics") sendDigitalAnalytics(event);
+      if (destination === "adsConversion") sendAdsConversion(event);
     } catch (error) { record.status = "failed"; }
   }
   renderMeasurementDebug();
@@ -51,7 +63,8 @@ function renderMeasurementDebug() {
   if (!surface) return;
   surface.textContent = JSON.stringify({
     dataLayer: window.dataLayer, routing: window.tmsRouting,
-    collector: window.collectorDebug, digitalAnalytics: window.analyticsDebug
+    collector: window.collectorDebug, digitalAnalytics: window.analyticsDebug,
+    demo: "Digital Analytics / Ads: HTTP GET a recibos estáticos del sitio, sin persistencia ni procesamiento vendor"
   }, null, 2);
 }
 

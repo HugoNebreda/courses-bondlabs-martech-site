@@ -1,5 +1,18 @@
 # Public Repository Publication Instructions
 
+## T-010 artifact handoff
+
+This artifact includes the closed teaching Lab, eight synthetic user logins with
+separate club attributes, session trace history and same-site simulated HTTP
+receipts in V4–V6. Preserve demo-sinks/analytics.json and ads.json at each version's
+relative path; these are static simulations, not vendor services.
+Before a new live V5/V6 smoke, update all four canonical Apps Script files from
+the private source, run additive setupClassroom and version the existing Web App,
+keeping the same /exec and Sheet columns. Four club decision rows are added;
+HOME prioritizes recovery over club over running. The prior T-009 human smoke
+does not establish post-T010 readiness. Publication is manual; no Google evidence
+is generated or claimed by this artifact. Follow the private T010 validation guide.
+
 This repository is a **generated publication artifact** for the Bondlabs MarTech Sandbox.
 
 The private source repository remains the source of truth. Do not treat this public repository as a second development source.

@@ -1,8 +1,12 @@
-.how-to-open { display: block; margin: .3rem auto .7rem; padding: .35rem .6rem; border: 0; background: transparent; color: inherit; text-decoration: underline; cursor: pointer; font: inherit; font-size: .85rem; }
-.how-to-dialog { width: min(38rem, 90vw); max-height: 85vh; overflow: auto; padding: 1.5rem; border: 1px solid #c9d1cd; border-radius: .7rem; color: #18322a; background: #fff; }
-.how-to-dialog::backdrop { background: rgb(15 35 28 / .4); }
-.how-to-dialog h2 { font-size: 1.3rem; }
-.how-to-dialog h3 { font-size: 1rem; }
-.how-to-dialog li { margin-bottom: .45rem; line-height: 1.5; }
-.how-to-dialog button { font: inherit; padding: .5rem .8rem; cursor: pointer; }
-.how-to-open:focus-visible, .how-to-dialog button:focus-visible { outline: 3px solid #167a5b; outline-offset: 3px; }
+.how-to-open { margin:.6rem 1rem; border:1px solid #b7c4c1; border-radius:.5rem; background:#fff; color:#173e35; padding:.55rem .9rem; cursor:pointer; }
+.how-to-dialog { position:fixed; inset:0 0 0 auto; margin:0; width:min(34rem,94vw); height:100dvh; max-height:100dvh; max-width:94vw; box-sizing:border-box; padding:1.4rem; border:0; border-left:1px solid #b7c4c1; box-shadow:-.4rem 0 1.8rem #173e3526; overflow:auto; z-index:100; background:#fff; color:#173e35; }
+.how-to-dialog:not([open]) { display:none; }
+.how-to-dialog section { margin:1rem 0; }
+.how-to-dialog li { margin:.5rem 0; }
+.how-to-dialog .measurement-note { margin:1rem 0; padding:.8rem; }
+.how-to-dialog pre { max-height:18rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+.how-to-dialog input:not([type=checkbox]) { max-width:100%; box-sizing:border-box; }
+.how-to-dialog :focus-visible,.how-to-open:focus-visible { outline:3px solid #cf7542; outline-offset:3px; }
+#how-to-close { position:sticky; top:0; padding:.65rem; background:#173e35; color:white; border:0; border-radius:.4rem; cursor:pointer; }
+.club-profile-info { margin:1rem auto; max-width:72rem; padding:.9rem 1.2rem; background:#edf4f0; border-radius:.7rem; }
+#activation-loyalty { border:2px solid #d99b35; background:#fff7e5; padding:1.5rem; }

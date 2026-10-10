@@ -2,11 +2,54 @@
 
 // Synthetic fixtures, not authentication credentials or a production identity graph.
 const DEMO_ACCOUNTS = {
-  club_norte: { user_id: "u_204", code: "204204" },
-  club_sur: { user_id: "u_305", code: "305305" },
-  club_este: { user_id: "u_418", code: "418418" },
-  club_oeste: { user_id: "u_527", code: "527527" }
+  "runner_01": {
+    "user_id": "u_101",
+    "club_id": "club_norte",
+    "code": "1101"
+  },
+  "runner_02": {
+    "user_id": "u_102",
+    "club_id": "club_norte",
+    "code": "1102"
+  },
+  "runner_03": {
+    "user_id": "u_201",
+    "club_id": "club_sur",
+    "code": "1201"
+  },
+  "runner_04": {
+    "user_id": "u_202",
+    "club_id": "club_sur",
+    "code": "1202"
+  },
+  "runner_05": {
+    "user_id": "u_301",
+    "club_id": "club_este",
+    "code": "1301"
+  },
+  "runner_06": {
+    "user_id": "u_302",
+    "club_id": "club_este",
+    "code": "1302"
+  },
+  "runner_07": {
+    "user_id": "u_401",
+    "club_id": "club_oeste",
+    "code": "1401"
+  },
+  "runner_08": {
+    "user_id": "u_402",
+    "club_id": "club_oeste",
+    "code": "1402"
+  }
 };
+const CLUB_AFFINITIES = {
+  "club_norte": "Trail, montaña y clima frío",
+  "club_sur": "Running ligero, calor e hidratación",
+  "club_este": "Road y running urbano",
+  "club_oeste": "Outdoor, viento y lluvia"
+};
+function clubForUser(user) { return Object.values(DEMO_ACCOUNTS).find(account => account.user_id === user)?.club_id || null; }
 const MODEL_KEY = "mt_v5_model";
 function emptyProfileModel() { return { RAW_EVENTS: [], IDENTITY_LINKS: [], PROFILES: [], AUDIENCES: [] }; }
 function readProfileModel() {
@@ -19,16 +62,28 @@ function readProfileModel() {
 
 function deriveProfiles(model) {
   const profiles = new Map();
+  for (const link of model.IDENTITY_LINKS) {
+    if (link.evidence !== "synthetic_code_validated" || link.link_reason !== "authenticated_session") continue;
+    const club = clubForUser(link.user_id);
+    if (!profiles.has(link.user_id)) profiles.set(link.user_id, {profile_key:link.user_id, user_id:link.user_id, club_id:club, affinities:CLUB_AFFINITIES[club] || null, road_evidence:[], visitor_ids:[], observed_cart_quantity:0, running_interest:false, observed_revenue:0, transactions:[]});
+  }
   for (const event of model.RAW_EVENTS) {
     const link = model.IDENTITY_LINKS.find(item => item.visitor_id === event.identity.visitor_id &&
       item.link_reason === "authenticated_session" && item.evidence === "synthetic_code_validated");
     const key = link ? link.user_id : event.identity.visitor_id;
     if (!profiles.has(key)) profiles.set(key, { profile_key: key, user_id: link ? link.user_id : null,
+      club_id: link ? clubForUser(link.user_id) : null, affinities: link ? CLUB_AFFINITIES[clubForUser(link.user_id)] || null : null, road_evidence: [],
       visitor_ids: [], observed_cart_quantity: 0, running_interest: false, observed_revenue: 0, transactions: [] });
     const profile = profiles.get(key);
     if (!profile.visitor_ids.includes(event.identity.visitor_id)) profile.visitor_ids.push(event.identity.visitor_id);
     if (["view_item", "select_item", "add_to_cart"].includes(event.event_name) &&
-        event.ecommerce.items.some(item => item.item_category === "road")) profile.running_interest = true;
+        event.ecommerce.items.some(item => item.item_category === "road")) {
+      for (const item of event.ecommerce.items.filter(item => item.item_category === "road")) {
+        const key = event.event_name + ":" + item.item_id;
+        if (item.item_id && !profile.road_evidence.includes(key)) profile.road_evidence.push(key);
+      }
+      profile.running_interest = profile.road_evidence.length >= 3 && new Set(profile.road_evidence.map(key => key.split(":")[1])).size >= 2;
+    }
     const quantity = event.ecommerce.items.reduce((sum, item) => sum + item.quantity, 0);
     if (event.event_name === "add_to_cart") profile.observed_cart_quantity += quantity;
     if (event.event_name === "remove_from_cart") profile.observed_cart_quantity = Math.max(0, profile.observed_cart_quantity - quantity);
@@ -81,13 +136,21 @@ function linkDemoAccount(alias, code) {
   }
   saveProfileModel(model);
   renderPrivacyContext();
-  return { ok: true, message: "Enlace sintético validado: " + account.user_id + ". No es autenticación de producción." };
+  return { ok: true, message: "Usuario demo: " + alias + " · " + account.club_id.replace("club_", "Club ") + ". No es autenticación de producción." };
 }
 function clearProfileContext() {
   try { sessionStorage.removeItem(MODEL_KEY); } catch (error) { /* Fail closed. */ }
   renderProfileDebug();
 }
 function renderProfileDebug() {
+  const badge = document.getElementById("club-profile-info");
+  if (badge) {
+    const visitor = typeof readVisitorCookie === "function" ? readVisitorCookie() : null;
+    const link = readProfileModel().IDENTITY_LINKS.find(row => row.visitor_id === visitor);
+    const account = Object.entries(DEMO_ACCOUNTS).find(([, value]) => value.user_id === link?.user_id);
+    badge.hidden = !account;
+    badge.textContent = account ? "Usuario demo: " + account[0] + " · " + account[1].club_id.replace("club_", "Club ") + " · Afinidad ficticia: " + CLUB_AFFINITIES[account[1].club_id] : "";
+  }
   const surface = document.getElementById("profile-debug");
   if (surface) surface.textContent = JSON.stringify(deriveProfiles(readProfileModel()), null, 2);
 }

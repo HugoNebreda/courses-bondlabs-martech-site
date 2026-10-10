@@ -16,8 +16,17 @@ function activationSurface() {
   return null;
 }
 
+function priorityActivation(input) {
+  if (input?.surface === "confirmation") return input.audiences.includes("high_value") ? "loyalty_thank_you" : null;
+  if (["home","cart"].includes(input?.surface) && input.audiences.includes("cart_abandoner")) return "cart_recovery_reminder";
+  if (input?.surface === "home" && /^club_(norte|sur|este|oeste)$/.test(input.club_id || "")) return input.club_id + "_home";
+  if (input?.surface === "home" && input.audiences.includes("running_interest")) return "running_interest_home";
+  return null;
+}
+
 function compatibleActivation(action, input) {
-  if (!input) return false;
+  if (!input || action !== priorityActivation(input)) return false;
+  if (/^club_(norte|sur|este|oeste)_home$/.test(action)) return input.surface === "home" && action === input.club_id + "_home";
   if (action === "running_interest_home") return input.surface === "home" && input.audiences.includes("running_interest");
   if (action === "cart_recovery_reminder") return ["home", "cart"].includes(input.surface) && input.audiences.includes("cart_abandoner");
   if (action === "loyalty_thank_you") return input.surface === "confirmation" && input.audiences.includes("high_value");
@@ -34,10 +43,17 @@ function activationInput() {
   const key = identity.user_id || identity.visitor_id;
   const membership = readProfileModel().AUDIENCES.find(row => row.profile_key === key);
   if (membership && !membership.audiences.every(label => ["cart_abandoner", "running_interest", "high_value"].includes(label))) return null;
-  return { profile_key: key, surface, audiences: membership ? membership.audiences.slice() : [] };
+  const profile = readProfileModel().PROFILES?.find(row => row.profile_key === key);
+  return { profile_key: key, surface, ...(profile?.club_id ? {club_id: profile.club_id} : {}), audiences: membership ? membership.audiences.slice() : [] };
 }
 
 function renderActivation() {
+  const club = document.getElementById("activation-club");
+  if (club) {
+    club.hidden = !/^club_(norte|sur|este|oeste)_home$/.test(window.activationDebug.variant);
+    const copy = document.getElementById("activation-club-copy");
+    if (copy && !club.hidden) copy.textContent = window.activationDebug.input.club_id.replace("club_", "Club ") + " · " + CLUB_AFFINITIES[window.activationDebug.input.club_id];
+  }
   const offer = document.getElementById("activation-offer");
   if (offer) offer.hidden = window.activationDebug.variant !== "cart_recovery_reminder";
   const running = document.getElementById("activation-running");
@@ -113,6 +129,7 @@ function refreshActivation() {
     url.searchParams.set("surface", input.surface);
     // Only consented audience labels go to decisioning, no raw events or identity.
     url.searchParams.set("audiences", input.audiences.join(","));
+    if (input.club_id) url.searchParams.set("club_id", input.club_id);
     activationScript = document.createElement("script");
     activationScript.src = url.href;
     activationScript.onerror = () => liveFailure("live_error_standard");

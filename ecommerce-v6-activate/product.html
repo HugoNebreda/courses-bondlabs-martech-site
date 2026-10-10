@@ -71,17 +71,17 @@
     <pre id="measurement-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>
   </details>
   <details class="measurement-note">
-    <summary>Club ficticio · enlace de identidad, perfiles y audiencias</summary>
+    <summary>Identidad demo · atributos de perfil y audiencias</summary>
   <!-- T009 accounts start -->
-    <p>Cuentas sintéticas de aula (una por grupo): club_norte / 204204 → u_204; club_sur / 305305 → u_305; club_este / 418418 → u_418; club_oeste / 527527 → u_527. No son cuentas reales. Para cambiar de grupo, retira y vuelve a aceptar el permiso.</p>
+    <p>Login demo: runner_01 / 1101 → u_101 · club_norte; runner_02 / 1102 → u_102 · club_norte; runner_03 / 1201 → u_201 · club_sur; runner_04 / 1202 → u_202 · club_sur; runner_05 / 1301 → u_301 · club_este; runner_06 / 1302 → u_302 · club_este; runner_07 / 1401 → u_401 · club_oeste; runner_08 / 1402 → u_402 · club_oeste. Usuarios y clubs son distintos. Cambiar usuario requiere retirar y volver a aceptar permiso.</p>
   <!-- T009 accounts end -->
-    <p>Demo: alias club_norte y código 204204. Datos sintéticos; no introduzcas datos personales.</p>
-    <form id="demo-signin"><label>Alias ficticio <input id="demo-alias" value="club_norte" autocomplete="off"></label>
+    <p>Usuario ≠ club: dos clientes sintéticos por club. No introduzcas datos personales.</p>
+    <form id="demo-signin"><label>Usuario demo <input id="demo-alias" value="runner_01" autocomplete="off"></label>
       <label>Código ficticio <input id="demo-code" inputmode="numeric" autocomplete="off"></label>
       <button class="button" type="submit">Validar enlace demo</button></form>
     <p id="signin-status" role="status"></p>
     <p>RAW_EVENTS + IDENTITY_LINKS → PROFILES → AUDIENCES. La ausencia de una compra observada no demuestra que no se compró.</p>
-    <p>Reglas de demo: carrito observado pendiente → cart_abandoner; interés observado en categoría road → running_interest; compras observadas ≥ 300 EUR o tres transaction_id únicos → high_value. Perfiles anónimos también pueden pertenecer a audiencias.</p>
+    <p>Reglas de demo: carrito observado pendiente → cart_abandoner; tres señales distintas en dos productos road → running_interest; compras observadas ≥ 300 EUR o tres transaction_id únicos → high_value. Perfiles anónimos también pueden pertenecer a audiencias.</p>
     <pre id="profile-debug" style="max-height:20rem;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere"></pre>
   </details>
   <section id="activation-offer" class="measurement-note" aria-label="Recordatorio de carrito" hidden>

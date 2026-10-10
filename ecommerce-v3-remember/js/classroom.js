@@ -3,9 +3,34 @@
 // T-009: explicit classroom integration. Original version logic remains inspectable.
 if (window.CLASSROOM_ENDPOINT) SHOP_CONFIG.collectorUrl = window.CLASSROOM_ENDPOINT;
 
-let teachingTraceEnabled = new URLSearchParams(location.search).get("trace") === "1";
+const TRACE_STATE_KEY = "mt_v3_trace_enabled";
+const TRACE_HISTORY_KEY = "mt_v3_trace_history";
+let teachingTraceEnabled = false;
+let teachingTraceHistory = [];
+try {
+  const stored = JSON.parse(sessionStorage.getItem(TRACE_HISTORY_KEY) || "[]");
+  if (Array.isArray(stored)) teachingTraceHistory = stored.filter(entry => typeof entry.stage === "string" && typeof entry.explanation === "string").slice(-60);
+  teachingTraceEnabled = sessionStorage.getItem(TRACE_STATE_KEY) === "on";
+} catch (error) { /* Storage unavailable: trace remains usable in memory. */ }
+const traceQuery = new URLSearchParams(location.search).get("trace");
+if (traceQuery === "1" || traceQuery === "0") {
+  teachingTraceEnabled = traceQuery === "1";
+  try { sessionStorage.setItem(TRACE_STATE_KEY, teachingTraceEnabled ? "on" : "off"); } catch (error) {}
+}
+function renderTeachingTraceHistory() {
+  const surface = document.getElementById("teaching-trace-history");
+  if (surface) surface.textContent = teachingTraceHistory.map(entry => entry.stage + " · " + entry.explanation + "\n" + JSON.stringify(entry.identifiers)).join("\n\n");
+}
 function teachingTrace(stage, explanation, identifiers = {}) {
   if (!teachingTraceEnabled) return;
+  try {
+    const allowed = ["run_id","event_id","transaction_id","visitor_id","session_id","user_id","operation","profile_keys","profile_key","memberships","audiences","request_id","surface","decision_id","action","eligible","source","variant"];
+    const safe = JSON.parse(JSON.stringify(identifiers, (key, value) => !key || allowed.includes(key) || /^\d+$/.test(key) ? value : undefined));
+    teachingTraceHistory.push({ stage: stage.slice(0,80), explanation: explanation.slice(0,400), identifiers: safe });
+    teachingTraceHistory = teachingTraceHistory.slice(-60);
+    try { sessionStorage.setItem(TRACE_HISTORY_KEY, JSON.stringify(teachingTraceHistory)); } catch (error) {}
+    renderTeachingTraceHistory();
+  } catch (error) { /* Trace never controls measurement. */ }
   try {
     console.groupCollapsed("[MARTECH TRACE] " + stage + " · " + explanation);
     console.log(identifiers);
@@ -76,5 +101,8 @@ setAnalyticsConsent = function (choice) {
 const traceControl = document.getElementById("teaching-trace");
 if (traceControl) {
   traceControl.checked = teachingTraceEnabled;
-  traceControl.onchange = () => { teachingTraceEnabled = traceControl.checked; };
+  traceControl.onchange = () => {
+    teachingTraceEnabled = traceControl.checked;
+    try { sessionStorage.setItem(TRACE_STATE_KEY, teachingTraceEnabled ? "on" : "off"); } catch (error) {}
+  };
 }
