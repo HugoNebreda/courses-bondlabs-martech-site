@@ -69,6 +69,8 @@ function deriveProfiles(model) {
   }
   for (const event of model.RAW_EVENTS) {
     const link = model.IDENTITY_LINKS.find(item => item.visitor_id === event.identity.visitor_id &&
+      // D-036: attribute only identity already present on the observed event.
+      item.user_id === event.identity.user_id &&
       item.link_reason === "authenticated_session" && item.evidence === "synthetic_code_validated");
     const key = link ? link.user_id : event.identity.visitor_id;
     if (!profiles.has(key)) profiles.set(key, { profile_key: key, user_id: link ? link.user_id : null,

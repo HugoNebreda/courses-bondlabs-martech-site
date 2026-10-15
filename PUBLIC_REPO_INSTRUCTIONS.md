@@ -83,3 +83,15 @@ adds missing decision IDs without overwriting teacher edits. The new read contra
 requires surface and echoes it in the callback. An old deployment stays standard.
 This artifact cannot update Google. Report pending final human smoke, including
 group isolation and live surface decisions; never claim CLASSROOM_READY here.
+
+## V5 customer-history read handoff
+
+This export adds a received customer-history summary after validated V5 demo login.
+Only events already carrying the validated user_id when collected contribute;
+guest activity is not attributed by a later login. Browser memory stays separate.
+The canonical private Apps Script source now supports the fixed-callback
+customer_profile read on the SAME /exec URL. The teacher must update the current
+four .gs files, run additive setupClassroom and version the existing Web App
+before publishing this export. The old deployment does not support this read.
+No schema migration or seeded history. Final real-Google user-history smoke is
+manual; automated/local success does not prove remote receipt or deployment.

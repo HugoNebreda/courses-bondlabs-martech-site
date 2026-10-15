@@ -1,0 +1,8 @@
+.v5-customer-profile { max-width:1124px; margin:0 auto 14px; padding:14px 18px; background:#edf4f0; border:1px solid var(--line); border-radius:8px; color:var(--ink); }
+.v5-customer-profile[hidden] { display:none; }
+.v5-customer-profile h2 { font-size:15px; margin:0 0 8px; }
+#customer-profile-metrics { display:flex; flex-wrap:wrap; gap:6px 18px; font-size:13px; }
+#customer-profile-status { color:var(--muted); font-size:12px; margin:8px 0; }
+.v5-customer-profile button { padding:6px 10px; background:#fff; color:var(--green); border:1px solid #b7c4c1; border-radius:5px; font-size:12px; cursor:pointer; }
+@media(max-width:1180px) { .v5-customer-profile { margin-left:28px; margin-right:28px; } }
+@media(max-width:600px) { .v5-customer-profile { margin-left:18px; margin-right:18px; } }
