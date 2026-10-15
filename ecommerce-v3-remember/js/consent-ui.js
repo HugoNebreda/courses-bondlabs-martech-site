@@ -37,8 +37,8 @@
   const choices = document.createElement("div");
   choices.className = "v3-consent-choices";
   for (const [id, heading, explanation] of [
-    ["analytics-grant", "Si aceptas", "Las nuevas acciones instrumentadas podrán medirse con un identificador anónimo del navegador y otro de sesión. No identifican a una persona. No se recuperan las acciones anteriores al permiso."],
-    ["analytics-deny", "Si rechazas o retiras el permiso", "Las siguientes acciones no generan medición analítica opcional y se eliminan los identificadores analíticos de este navegador. Puedes seguir comprando. Esto no borra datos ya recibidos por el servicio."]
+    ["analytics-grant", "Si aceptas", "Las nuevas acciones instrumentadas podrán medirse con un identificador anónimo del navegador y otro de sesión. No identifican a una persona. El resumen de actividad se conserva en este navegador al volver. No se recuperan las acciones anteriores al permiso."],
+    ["analytics-deny", "Si rechazas o retiras el permiso", "Las siguientes acciones no generan medición analítica opcional y se eliminan los identificadores analíticos y el resumen de actividad de este navegador. Puedes seguir comprando. Esto no borra datos ya recibidos por el servicio."]
   ]) {
     const section = document.createElement("section");
     const headingNode = document.createElement("h3");
