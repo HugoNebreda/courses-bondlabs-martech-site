@@ -43,6 +43,52 @@ const DEMO_ACCOUNTS = {
     "code": "1402"
   }
 };
+// D039 teacher demo accounts start
+Object.assign(DEMO_ACCOUNTS, {
+  "profe_umbral": {
+    "user_id": "u_901",
+    "club_id": "club_norte",
+    "code": "9901",
+    "teacher_only": true
+  },
+  "profe_frecuente": {
+    "user_id": "u_902",
+    "club_id": "club_sur",
+    "code": "9902",
+    "teacher_only": true
+  },
+  "profe_gran_compra": {
+    "user_id": "u_903",
+    "club_id": "club_este",
+    "code": "9903",
+    "teacher_only": true
+  },
+  "profe_multisesion": {
+    "user_id": "u_904",
+    "club_id": "club_oeste",
+    "code": "9904",
+    "teacher_only": true
+  },
+  "profe_anonimo": {
+    "user_id": "u_905",
+    "club_id": "club_norte",
+    "code": "9905",
+    "teacher_only": true
+  },
+  "profe_duplicado": {
+    "user_id": "u_906",
+    "club_id": "club_sur",
+    "code": "9906",
+    "teacher_only": true
+  },
+  "profe_nuevo": {
+    "user_id": "u_907",
+    "club_id": "club_norte",
+    "code": "9907",
+    "teacher_only": true
+  }
+});
+// D039 teacher demo accounts end
 const CLUB_AFFINITIES = {
   "club_norte": "Trail, montaña y clima frío",
   "club_sur": "Running ligero, calor e hidratación",

@@ -35,6 +35,7 @@
   head.append(row); table.append(head);
   const body = document.createElement("tbody");
   for (const [alias, account] of Object.entries(DEMO_ACCOUNTS)) {
+    if (account.teacher_only) continue;
     const row = document.createElement("tr");
     for (const value of [alias, account.code, account.club_id.replace("club_", "Club ")]) { const cell = document.createElement("td"); cell.textContent = value; row.append(cell); }
     body.append(row);

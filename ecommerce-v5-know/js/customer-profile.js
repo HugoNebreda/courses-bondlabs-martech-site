@@ -73,6 +73,8 @@ window.MarTechSandbox = window.MarTechSandbox || {};
       const attempt = request.attempt;
       if (attempt < 3) scheduled = setTimeout(() => refreshProfile(attempt + 1), 2000);
     }
+    if (Number.isSafeInteger(result.profile.seed_event_count) && result.profile.seed_event_count > 0)
+      status.textContent += " Incluye datos ficticios precargados por el docente.";
   };
   function refreshProfile(attempt = 0) {
     if (!panel) return;
