@@ -106,3 +106,11 @@ Before publication, deploy the CURRENT four canonical .gs files, run additive
 setupClassroom (new decision_lifetime_10k row), and version the SAME Web App.
 No endpoint or Sheet column changes. Final human production validation is pending;
 static/local checks do not establish functional production readiness.
+
+## Visible demo login presentation
+
+V5/V6 now expose the existing demo login in a toolbar modal beside Lab and
+consent, with the eight existing synthetic account hints. This update changes
+presentation only; identity/consent/history/activation and the canonical .gs
+bundle are unchanged from the previously confirmed deployment. No new Google
+redeployment is needed for this presentation-only refresh. Preserve the endpoint.

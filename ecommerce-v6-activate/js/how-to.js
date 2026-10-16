@@ -5,7 +5,7 @@
   const guide = {
   "title": "V6 · Activate",
   "student": [
-    "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log.",
+    "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log. Para identificarte, pulsa Acceso demo junto a Laboratorio; las cuentas y códigos ficticios están en ese diálogo.",
     "Genera tres señales distintas en dos productos road (Carbon Pro y Ritmo Daily); vuelve a home.",
     "Activa Traza docente y observa el GET activation, surface=home y la decisión.",
     "Añade al carrito y visita Carrito: ‘Tu carrito te espera’.",

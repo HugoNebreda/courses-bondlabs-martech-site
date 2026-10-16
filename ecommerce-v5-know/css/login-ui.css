@@ -1,0 +1,18 @@
+.demo-login-controls { display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; }
+.demo-login-open { border:1px solid #b7c4c1; border-radius:.5rem; background:#fff; color:#173e35; padding:.55rem .9rem; cursor:pointer; font-size:13px; }
+#login-summary { font-size:12px; color:var(--muted); overflow-wrap:anywhere; }
+.demo-login-dialog { width:min(680px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); padding:28px; border:1px solid var(--line); border-radius:14px; background:var(--paper); color:var(--ink); overflow:auto; }
+.demo-login-dialog::backdrop { background:#17332b66; }
+.demo-login-dialog h2 { font-size:26px; margin-bottom:12px; }
+.demo-login-dialog p { font-size:14px; }
+.demo-login-permission { padding:12px; border-radius:8px; background:var(--wash,#eef4ef); }
+.demo-login-dialog form { display:grid; gap:12px; margin:20px 0 12px; }
+.demo-login-dialog label { display:grid; gap:6px; font-size:14px; }
+.demo-login-dialog input { width:100%; min-width:0; }
+.demo-login-accounts { overflow:auto; margin:20px 0 12px; }
+.demo-login-accounts table { width:100%; border-collapse:collapse; font-size:13px; }
+.demo-login-accounts caption { text-align:left; font-weight:700; padding-bottom:8px; }
+.demo-login-accounts th,.demo-login-accounts td { text-align:left; padding:8px; border-bottom:1px solid var(--line); white-space:nowrap; }
+.demo-login-dialog #signin-status { min-height:1.5em; }
+.demo-login-dialog #login-close { margin-top:12px; }
+@media(max-width:600px) { .demo-login-dialog { padding:20px; } .demo-login-controls { gap:6px 8px; } }

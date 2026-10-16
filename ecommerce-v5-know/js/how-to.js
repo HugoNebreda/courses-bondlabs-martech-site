@@ -6,7 +6,7 @@
   "title": "V5 · Know",
   "student": [
     "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log.",
-    "Abre Laboratorio → Identidad demo y elige un usuario sintético.",
+    "Pulsa Acceso demo, junto a Laboratorio y Gestionar consentimiento. Las cuentas y códigos ficticios están en ese diálogo.",
     "Valida runner_03 / 1201: usuario u_201, atributo club_sur.",
     "Observa visitor_id enlazado a user_id; dos usuarios comparten cada club.",
     "Comprueba IDENTITY_LINKS en el panel y en el Sheet.",
