@@ -95,3 +95,14 @@ four .gs files, run additive setupClassroom and version the existing Web App
 before publishing this export. The old deployment does not support this read.
 No schema migration or seeded history. Final real-Google user-history smoke is
 manual; automated/local success does not prove remote receipt or deployment.
+
+## V6 received history and 10,000 EUR gratitude
+
+V6 inherits V5 received customer history with event-time attribution. A new live
+confirmation decision thanks a known customer at >=10,000 EUR received identified
+purchases across V6 sessions, including the current received purchase. Guest
+purchases never become known retroactively. Existing offers remain in place.
+Before publication, deploy the CURRENT four canonical .gs files, run additive
+setupClassroom (new decision_lifetime_10k row), and version the SAME Web App.
+No endpoint or Sheet column changes. Final human production validation is pending;
+static/local checks do not establish functional production readiness.

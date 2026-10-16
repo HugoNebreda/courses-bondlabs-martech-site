@@ -17,6 +17,7 @@ function activationSurface() {
 }
 
 function priorityActivation(input) {
+  if (input?.surface === "confirmation" && input.customer?.eligible) return "lifetime_10k_thank_you";
   if (input?.surface === "confirmation") return input.audiences.includes("high_value") ? "loyalty_thank_you" : null;
   if (["home","cart"].includes(input?.surface) && input.audiences.includes("cart_abandoner")) return "cart_recovery_reminder";
   if (input?.surface === "home" && /^club_(norte|sur|este|oeste)$/.test(input.club_id || "")) return input.club_id + "_home";
@@ -29,6 +30,7 @@ function compatibleActivation(action, input) {
   if (/^club_(norte|sur|este|oeste)_home$/.test(action)) return input.surface === "home" && action === input.club_id + "_home";
   if (action === "running_interest_home") return input.surface === "home" && input.audiences.includes("running_interest");
   if (action === "cart_recovery_reminder") return ["home", "cart"].includes(input.surface) && input.audiences.includes("cart_abandoner");
+  if (action === "lifetime_10k_thank_you") return input.surface === "confirmation" && input.customer?.eligible;
   if (action === "loyalty_thank_you") return input.surface === "confirmation" && input.audiences.includes("high_value");
   return false;
 }
@@ -44,7 +46,10 @@ function activationInput() {
   const membership = readProfileModel().AUDIENCES.find(row => row.profile_key === key);
   if (membership && !membership.audiences.every(label => ["cart_abandoner", "running_interest", "high_value"].includes(label))) return null;
   const profile = readProfileModel().PROFILES?.find(row => row.profile_key === key);
-  return { profile_key: key, surface, ...(profile?.club_id ? {club_id: profile.club_id} : {}), audiences: membership ? membership.audiences.slice() : [] };
+  const receipt = window.MarTechSandbox.customerReceipt?.();
+  const order = surface === "confirmation" ? readOrder() : null;
+  const customer = receipt?.eligible && receipt.user_id === identity.user_id && order?.transaction_id === receipt.transaction_id ? receipt : null;
+  return { ...(customer ? {customer} : {}), profile_key: key, surface, ...(profile?.club_id ? {club_id: profile.club_id} : {}), audiences: membership ? membership.audiences.slice() : [] };
 }
 
 function renderActivation() {
@@ -58,6 +63,8 @@ function renderActivation() {
   if (offer) offer.hidden = window.activationDebug.variant !== "cart_recovery_reminder";
   const running = document.getElementById("activation-running");
   if (running) running.hidden = window.activationDebug.variant !== "running_interest_home";
+  const lifetime = document.getElementById("activation-lifetime");
+  if (lifetime) lifetime.hidden = window.activationDebug.variant !== "lifetime_10k_thank_you";
   const loyalty = document.getElementById("activation-loyalty");
   if (loyalty) {
     const wasHidden = loyalty.hidden;
@@ -106,6 +113,7 @@ function refreshActivation() {
   renderActivation();
   if (!input) return;
   if (!SHOP_CONFIG.activationUrl) {
+    if (input.customer) { window.activationDebug.source = "lifetime_live_required"; renderActivation(); return; }
     if (typeof snapshotActivation === "function") finishActivation(snapshotActivation(activationRequest.input), "static_snapshot");
     else { window.activationDebug.source = "snapshot_unavailable"; renderActivation(); }
     return;
@@ -127,7 +135,12 @@ function refreshActivation() {
     url.searchParams.set("operation", "activation");
     url.searchParams.set("request_id", requestId);
     url.searchParams.set("surface", input.surface);
-    // Only consented audience labels go to decisioning, no raw events or identity.
+    // D-037: only the synthetic customer and received transaction are added for the milestone.
+    if (input.customer) {
+      url.searchParams.set("sandbox_version", "v6-activate");
+      url.searchParams.set("user_id", input.customer.user_id);
+      url.searchParams.set("transaction_id", input.customer.transaction_id);
+    }
     url.searchParams.set("audiences", input.audiences.join(","));
     if (input.club_id) url.searchParams.set("club_id", input.club_id);
     activationScript = document.createElement("script");
@@ -137,3 +150,7 @@ function refreshActivation() {
     document.head.appendChild(activationScript);
   } catch (error) { liveFailure("live_error_standard"); }
 }
+
+window.addEventListener("customerprofilechange", () => {
+  if (JSON.stringify(activationInput()) !== activationRequest?.signature) refreshActivation();
+});
