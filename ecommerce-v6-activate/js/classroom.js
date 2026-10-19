@@ -5,12 +5,12 @@ if (window.CLASSROOM_ENDPOINT) SHOP_CONFIG.collectorUrl = window.CLASSROOM_ENDPO
 if (window.CLASSROOM_ENDPOINT) SHOP_CONFIG.activationUrl = window.CLASSROOM_ENDPOINT;
 const TRACE_STATE_KEY = "mt_v6_trace_enabled";
 const TRACE_HISTORY_KEY = "mt_v6_trace_history";
-let teachingTraceEnabled = false;
+let teachingTraceEnabled = true;
 let teachingTraceHistory = [];
 try {
+  teachingTraceEnabled = sessionStorage.getItem(TRACE_STATE_KEY) !== "off";
   const stored = JSON.parse(sessionStorage.getItem(TRACE_HISTORY_KEY) || "[]");
   if (Array.isArray(stored)) teachingTraceHistory = stored.filter(entry => typeof entry.stage === "string" && typeof entry.explanation === "string").slice(-60);
-  teachingTraceEnabled = sessionStorage.getItem(TRACE_STATE_KEY) === "on";
 } catch (error) { /* Storage unavailable: trace remains usable in memory. */ }
 const traceQuery = new URLSearchParams(location.search).get("trace");
 if (traceQuery === "1" || traceQuery === "0") {

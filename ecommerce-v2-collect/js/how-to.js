@@ -6,7 +6,7 @@
   "title": "V2 · Collect",
   "student": [
     "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log.",
-    "Activa Traza docente y abre un producto.",
+    "Abre un producto y observa en Console la Traza docente, activa por defecto.",
     "Añádelo al carrito y localiza el POST al collector /exec.",
     "Inspecciona event_name, event_id y parámetros de items.",
     "Busca ese event_id en RAW_EVENTS y EVENT_ITEMS del Sheet del profesor."

@@ -7,7 +7,7 @@
   "student": [
     "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log. Para identificarte, pulsa Acceso demo junto a Laboratorio; las cuentas y códigos ficticios están en ese diálogo.",
     "Genera tres señales distintas en dos productos road (Carbon Pro y Ritmo Daily); vuelve a home.",
-    "Activa Traza docente y observa el GET activation, surface=home y la decisión.",
+    "Observa en Console la Traza docente, activa por defecto: el GET activation, surface=home y la decisión.",
     "Añade al carrito y visita Carrito: ‘Tu carrito te espera’.",
     "Compra ≥300 EUR (p. ej. tres Carbon Pro) o realiza tres compras; revisa confirmation.",
     "Con el profesor, cambia eligible en ACTIVATION_DECISIONS y llama refreshActivation() en Console.",
