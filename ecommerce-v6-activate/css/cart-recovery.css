@@ -1,0 +1,12 @@
+.recovery-campaign { max-width:1124px; margin:20px auto; padding:24px; background:#eef4ef; border:1px solid var(--line); border-radius:14px; }
+.recovery-campaign h2 { font-size:28px; margin-bottom:12px; }
+.recovery-exit-dialog { width:min(600px,calc(100vw - 32px)); max-height:calc(100dvh - 32px); padding:28px; overflow:auto; border:1px solid var(--line); border-radius:14px; background:var(--paper); color:var(--ink); }
+.recovery-exit-dialog::backdrop { background:#17332b66; }
+.recovery-exit-dialog h2 { font-size:28px; margin-bottom:14px; }
+.recovery-exit-dialog p { font-size:14px; }
+#recovery-email-form { display:grid; gap:10px; margin:18px 0; }
+#recovery-email { width:100%; min-width:0; }
+#recovery-exit-close { margin-top:16px; }
+#recovery-origin-links { display:flex; flex-wrap:wrap; gap:8px; }
+#recovery-debug { max-height:16rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
+@media(max-width:600px) { .recovery-campaign { margin:12px 18px; padding:20px; } .recovery-exit-dialog { padding:20px; } }

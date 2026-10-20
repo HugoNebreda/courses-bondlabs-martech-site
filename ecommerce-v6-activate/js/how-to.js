@@ -8,7 +8,7 @@
     "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log. Para identificarte, pulsa Acceso demo junto a Laboratorio; las cuentas y códigos ficticios están en ese diálogo.",
     "Genera tres señales distintas en dos productos road (Carbon Pro y Ritmo Daily); vuelve a home.",
     "Observa en Console la Traza docente, activa por defecto: el GET activation, surface=home y la decisión.",
-    "Añade al carrito y visita Carrito: ‘Tu carrito te espera’.",
+    "Añade al carrito: prueba el recordatorio, Simular intención de salida (hasta 300 EUR / mayor de 300 EUR) y los enlaces vengodepartede del Laboratorio.",
     "Compra ≥300 EUR (p. ej. tres Carbon Pro) o realiza tres compras; revisa confirmation.",
     "Con el profesor, cambia eligible en ACTIVATION_DECISIONS y llama refreshActivation() en Console.",
     "Repite: decisión live frente a standard; comprueba el Sheet real."
@@ -18,7 +18,7 @@
     "AUDIENCE → DECISION REQUEST → DECISION RESPONSE → EXPERIENCE.",
     "Home: carrito > contenido por club > running. Confirmation: reconocimiento high_value; resto standard.",
     "La decisión remota puede dar standard; timeout/error nunca inventan oferta.",
-    "Activar puede personalizar contenido o agradecer una compra, sin descuentos ni anuncios."
+    "Compara audiencia, intención de salida y contexto de URL. Las nuevas ofertas son simuladas: no cambian precios/pedidos ni guardan emails."
   ]
 };
   const button = document.createElement("button");
