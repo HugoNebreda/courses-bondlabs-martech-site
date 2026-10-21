@@ -114,3 +114,25 @@ consent, with the eight existing synthetic account hints. This update changes
 presentation only; identity/consent/history/activation and the canonical .gs
 bundle are unchanged from the previously confirmed deployment. No new Google
 redeployment is needed for this presentation-only refresh. Preserve the endpoint.
+
+## Current backend compatibility handoff
+
+This refresh extends the supported synthetic identity and read-validation
+contract. The previously confirmed deployment predates this contract extension.
+Before publishing this refresh, update all four CURRENT canonical .gs files, run
+additive setupClassroom and version the SAME existing Web App (/exec and Sheet
+columns unchanged). No private datasets or provisioning files belong in this
+public artifact. Final functional production validation remains human.
+
+## D-042 editable V6 Sheet recovery
+
+This export REQUIRES the CURRENT four canonical .gs files, additive setupClassroom
+and a NEW version of the SAME Web App before publication. ACTIVATION_DECISIONS
+now appends trigger/min_cart_total/discount_percent/title/message/cta_label/theme/
+layout/priority after the original four preserved columns. No other table schema
+or endpoint changes. Recovery reads scoped received AUDIENCES rather than client
+assertions. Teacher-configured offers remain simulations, never order discounts.
+See the PRIVATE V6_SHEET_ACTIVATION_GUIDE for column edits and final human smoke.
+Do not publish the private guide, fixture CSVs or backend. D-039 manual imports
+remain a separate checkpoint; do not infer deployment confirmation from earlier
+messages predating this contract. Keep live failure standard and offline explicit.

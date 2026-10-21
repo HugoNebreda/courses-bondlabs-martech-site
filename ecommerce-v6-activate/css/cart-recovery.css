@@ -10,3 +10,14 @@
 #recovery-origin-links { display:flex; flex-wrap:wrap; gap:8px; }
 #recovery-debug { max-height:16rem; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; }
 @media(max-width:600px) { .recovery-campaign { margin:12px 18px; padding:20px; } .recovery-exit-dialog { padding:20px; } }
+
+/* D-042 finite presentation choices; no CSS/HTML is loaded from the Sheet. */
+.recovery-configured { --recovery-accent:#185d49; --recovery-tint:#edf6f1; background:var(--recovery-tint); border:2px solid var(--recovery-accent); padding:24px; border-radius:14px; color:#172d28; }
+.recovery-configured[data-theme="blue"] { --recovery-accent:#174c82; --recovery-tint:#edf4fc; }
+.recovery-configured[data-theme="orange"] { --recovery-accent:#8a3a0c; --recovery-tint:#fff3e8; }
+.recovery-configured .button { background:var(--recovery-accent); color:#fff; border-color:var(--recovery-accent); }
+.recovery-configured[data-layout="split"] { border-left-width:16px; padding-left:32px; }
+.recovery-configured[data-layout="spotlight"] { text-align:center; border-top-width:12px; }
+.recovery-configured[data-layout="spotlight"] h2 { font-size:clamp(28px,5vw,38px); }
+.recovery-configured small { display:block; margin-top:12px; }
+@media(max-width:600px) { .recovery-configured[data-layout="split"] { padding-left:20px; border-left-width:8px; } }

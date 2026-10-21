@@ -8,9 +8,9 @@
     "Abre Laboratorio → Cómo probar esta versión. Activa DevTools → Preserve log. Para identificarte, pulsa Acceso demo junto a Laboratorio; las cuentas y códigos ficticios están en ese diálogo.",
     "Genera tres señales distintas en dos productos road (Carbon Pro y Ritmo Daily); vuelve a home.",
     "Observa en Console la Traza docente, activa por defecto: el GET activation, surface=home y la decisión.",
-    "Añade al carrito: prueba el recordatorio, Simular intención de salida (hasta 300 EUR / mayor de 300 EUR) y los enlaces vengodepartede del Laboratorio.",
+    "Añade al carrito y espera la audiencia recibida en GSheet: prueba el recordatorio, Simular intención de salida y los enlaces vengodepartede del Laboratorio.",
     "Compra ≥300 EUR (p. ej. tres Carbon Pro) o realiza tres compras; revisa confirmation.",
-    "Con el profesor, cambia eligible en ACTIVATION_DECISIONS y llama refreshActivation() en Console.",
+    "Con el profesor, edita descuento, textos/CTA, theme, layout o mínimo en ACTIVATION_DECISIONS; pulsa Actualizar reglas desde GSheet y repite la salida.",
     "Repite: decisión live frente a standard; comprueba el Sheet real."
   ],
   "teacher": [
@@ -18,7 +18,7 @@
     "AUDIENCE → DECISION REQUEST → DECISION RESPONSE → EXPERIENCE.",
     "Home: carrito > contenido por club > running. Confirmation: reconocimiento high_value; resto standard.",
     "La decisión remota puede dar standard; timeout/error nunca inventan oferta.",
-    "Compara audiencia, intención de salida y contexto de URL. Las nuevas ofertas son simuladas: no cambian precios/pedidos ni guardan emails."
+    "Recuperación live: AUDIENCES recibidas → reglas editables en GSheet → experiencia. URL y modo offline siguen siendo simulaciones contextuales. Ninguna oferta cambia precios/pedidos ni guarda emails."
   ]
 };
   const button = document.createElement("button");
