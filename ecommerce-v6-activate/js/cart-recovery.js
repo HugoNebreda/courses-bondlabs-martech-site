@@ -24,7 +24,8 @@ function cartRecoveryDecision(cents, referrer) {
     const rules = window.MarTechSandbox.recoveryRules, state = window.MarTechSandbox.activationState;
     const initialReminder = document.getElementById("activation-offer")?.innerHTML;
     let reminder = null, reminderKey = null, reminderSequence = 0, exitSequence = 0, exitPending = false;
-    let previousContext = state.scope(), reminderExpiry = 0, renderedReminder = null, autoRetryAt = 0, autoRetryScope = null;
+    let preparedScope = null;
+    let previousContext = state.scope(), reminderExpiry = 0, renderedReminder = null;
     const read = key => { try { return sessionStorage.getItem(key); } catch (error) { return null; } };
     const store = (key,value) => { try { if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key,value); } catch (error) {} };
     const permitted = () => readAnalyticsConsent() === "granted";
@@ -49,7 +50,7 @@ function cartRecoveryDecision(cents, referrer) {
     document.body.append(dialog);
     const email = document.getElementById("recovery-email"), form = document.getElementById("recovery-email-form"), status = document.getElementById("recovery-exit-status"), continueLink = document.getElementById("recovery-exit-continue");
     const section = document.createElement("section"); section.id = "recovery-lab";
-    section.innerHTML = '<h3>Tres casos de recuperación de carrito</h3><ol><li>Audiencia: añade productos y cambia de página. La activación existente puede recordarte terminar la compra.</li><li>Intención de salida: GSheet configura audiencia, importe mínimo, descuento simulado, textos, color y diseño. Sin servicio configurado: >300 €, 10 %; hasta 300 €, email ficticio.</li><li>Origen simulado: vengodepartede=unamigo (10 %), usainbolt (50 %) o hugo (80 %).</li></ol><p>Se requiere consentimiento analítico. En escritorio, mueve el cursor fuera por el borde superior; en móvil usa el botón. Es una señal de intención, no una confirmación de abandono.</p><button class="text-button" id="recovery-rules-refresh" type="button">Actualizar reglas desde GSheet</button><button class="text-button" id="recovery-exit-simulate" type="button">Simular intención de salida</button><p id="recovery-lab-status" role="status" aria-live="polite"></p><p id="recovery-origin-links"></p><p>Una campaña de origen tiene prioridad sobre las recuperaciones: no se apilan descuentos. Edita ACTIVATION_DECISIONS y usa Actualizar reglas para saltar la caché. Las decisiones duran cinco minutos; cerrar el popup no reinicia su límite de aparición. El modo live lee la última AUDIENCES de esta versión, ejercicio y perfil; puede tardar en recibir nuevos eventos. Las ofertas son simuladas y no cambian precios/pedidos. El email no crea un perfil ni envía correos.</p><pre id="recovery-debug"></pre>';
+    section.innerHTML = '<h3>Tres casos de recuperación de carrito</h3><ol><li>Audiencia: añade productos y cambia de página. La activación existente puede recordarte terminar la compra.</li><li>Intención de salida: GSheet configura audiencia, importe mínimo, descuento simulado, textos, color y diseño. Sin servicio configurado: >300 €, 10 %; hasta 300 €, email ficticio.</li><li>Origen simulado: vengodepartede=unamigo (10 %), usainbolt (50 %) o hugo (80 %).</li></ol><p>Se requiere consentimiento analítico. En escritorio, mueve el cursor fuera por el borde superior; en móvil usa el botón. Es una señal de intención, no una confirmación de abandono.</p><button class="text-button" id="recovery-rules-refresh" type="button">Actualizar reglas desde GSheet</button><button class="text-button" id="recovery-demo-reset" type="button">Reiniciar demostración</button><button class="text-button" id="recovery-exit-simulate" type="button">Simular intención de salida</button><p id="recovery-lab-status" role="status" aria-live="polite"></p><p id="recovery-origin-links"></p><p>Una campaña de origen tiene prioridad sobre las recuperaciones: no se apilan descuentos. Edita ACTIVATION_DECISIONS y usa Actualizar reglas para saltar la caché. La configuración dura cinco minutos. Cada entrada actualiza audiencias; carrito y salida se evalúan localmente. Reiniciar demostración permite otra salida automática sin consultar. Cerrar el popup no reinicia su límite de aparición. El modo live lee la última AUDIENCES de esta versión, ejercicio y perfil; puede tardar en recibir nuevos eventos. Las ofertas son simuladas y no cambian precios/pedidos. El email no crea un perfil ni envía correos.</p><pre id="recovery-debug"></pre>';
     const lab = document.getElementById("how-to-dialog"); lab.querySelector("#how-to-close").before(section);
     const links = document.getElementById("recovery-origin-links");
     for (const [value,offer] of Object.entries(RECOVERY_REFERRALS)) {
@@ -68,8 +69,8 @@ function cartRecoveryDecision(cents, referrer) {
       return cart.items.length && !cart.unavailable && Number.isSafeInteger(cents) && cents > 0 ? {cart,cents} : null;
     }
     function traceSheet(decision,trigger) {
-      if (typeof teachingTrace === "function") teachingTrace("DECISION RESPONSE","Recuperación desde GSheet: " + (decision?.reason || "servicio no disponible; experiencia estándar") + ".", {
-        source:"live_sheet",trigger,request_id:decision?.request_id,decision_id:decision?.decision_id,
+      if (typeof teachingTrace === "function") teachingTrace("DECISION RESPONSE","Evaluación local con reglas y audiencias descargadas: " + (decision?.reason || "servicio no disponible; experiencia estándar") + ".", {
+        source:decision?.source,evaluation:"local",trigger,request_id:decision?.request_id,decision_id:decision?.decision_id,
         audiences:decision?.audiences,action:decision?.action,eligible:decision?.eligible || false,config:decision?.config || null});
     }
     function renderReminder() {
@@ -104,11 +105,11 @@ function cartRecoveryDecision(cents, referrer) {
     function refreshReminder(force = false) {
       const cart = currentCart(), context = rules.contextKey();
       const key = JSON.stringify({scope:state.scope(),cents:cart?.cents ?? null,url:SHOP_CONFIG.activationUrl});
-      if (!force && key === reminderKey && (reminderExpiry > Date.now() || window.cartRecoveryDebug.reminder?.source === "pending_sheet")) { renderReminder(); return; }
+      if (!force && key === reminderKey && (reminderExpiry > Date.now() || window.cartRecoveryDebug.reminder?.source === "evaluating_local")) { renderReminder(); return; }
       reminderKey = key; const sequence = ++reminderSequence; reminder = null; reminderExpiry = 0;
       window.cartRecoveryDebug.reminder = null; renderReminder();
       if (!SHOP_CONFIG.activationUrl || !permitted() || referrer() || !cart || !["catalog","cart"].includes(document.body.dataset.page)) return;
-      window.cartRecoveryDebug.reminder = {source:"pending_sheet"}; debug();
+      window.cartRecoveryDebug.reminder = {source:"evaluating_local"}; debug();
       rules.request("cart_return",cart.cents).then(result => {
         if (sequence !== reminderSequence || context !== rules.contextKey()) return;
         reminder = result; reminderExpiry = result?.cache?.expires_at || Date.now()+30000; window.cartRecoveryDebug.reminder = result || {source:"live_unavailable_standard"};
@@ -118,11 +119,11 @@ function cartRecoveryDecision(cents, referrer) {
     }
     const originalActivationRefresh = refreshActivation;
     refreshActivation = function (options = {}) { const result = originalActivationRefresh(options); refreshReminder(!!options.force); return result; };
-    function debug() { document.getElementById("recovery-debug").textContent = JSON.stringify(window.cartRecoveryDebug,null,2); }
+    function debug() { window.cartRecoveryDebug.snapshot=window.recoverySnapshotDebug; window.cartRecoveryDebug.popup_already_shown=seen; document.getElementById("recovery-debug").textContent = JSON.stringify(window.cartRecoveryDebug,null,2); }
     function synchronize() {
       state.sync();
       const context = state.scope();
-      if (context !== previousContext) { rules.cancel(); cancelExit(); previousContext = context; }
+      if (context !== previousContext) { cancelExit(); previousContext = context; }
       if (!permitted()) { rules.cancel(); cancelExit(); reminder = null; window.cartRecoveryDebug.exit = null; store(referralKey,null); store(seenKey,null); seen = false; close(); }
       if (!readCart().length) { seen = false; store(seenKey,null); }
       const origin = referrer(), allowedPage = document.body.dataset.page !== "confirmation";
@@ -139,23 +140,30 @@ function cartRecoveryDecision(cents, referrer) {
       }
       lastCampaign = origin;
       if (dialog.open && (!catalog || !readCart().length)) close();
+      const nextScope=rules.audienceScope();
+      if(nextScope!==preparedScope) {preparedScope=nextScope; rules.prepare();}
       refreshReminder(); debug();
     }
     async function showExit(simulated = false) {
       const hint = document.getElementById("recovery-lab-status");
-      if (!simulated && autoRetryScope === state.scope() && autoRetryAt > Date.now()) return false;
+      function blocked(reason) {window.cartRecoveryDebug.exit={eligible:false,reason,evaluation:"local"};debug();return false;}
+
       if (!permitted()) { if (simulated) hint.textContent = "Acepta la analítica en Gestionar consentimiento para probar la activación."; return false; }
       if (referrer()) { if (simulated) hint.textContent = "Hay una campaña de origen activa. Usa Quitar campaña para probar el popup."; return false; }
-      if (!catalog || document.body.dataset.page === "confirmation" || document.querySelector("#payment-form button:disabled")) return false;
+      if (!catalog) return blocked("catalog_not_ready");
+      if (document.body.dataset.page === "confirmation") return blocked("unsupported_surface");
+      if (document.querySelector("#payment-form button:disabled")) return blocked("payment_in_progress");
       const cart = cartSummary(catalog);
       if (!cart.items.length || cart.unavailable || catalog.store.currency !== "EUR") { if (simulated) hint.textContent = "Añade productos disponibles al carrito para probar este caso."; return false; }
-      if (exitPending || dialog.open || (!simulated && (seen || document.visibilityState !== "visible" || document.querySelector("dialog[open]")))) return false;
+      if (exitPending || dialog.open) return blocked("popup_or_evaluation_active");
+      if (!simulated && seen) return blocked("popup_already_shown");
+      if (!simulated && document.visibilityState !== "visible") return blocked("page_not_visible");
+      if (!simulated && document.querySelector("dialog[open]")) return blocked("another_dialog_open");
       if (typeof dialog.showModal !== "function") return false;
       const context = rules.contextKey(), attempt = ++exitSequence;
       let remote = null;
       if (SHOP_CONFIG.activationUrl) {
-        if (!simulated) { autoRetryScope=state.scope(); autoRetryAt=Date.now()+30000; }
-        exitPending = true; window.cartRecoveryDebug.exit = {source:"pending_sheet"}; debug(); hint.textContent = "Consultando las reglas de GSheet…";
+        exitPending = true; window.cartRecoveryDebug.exit = {source:"evaluating_local"}; debug(); hint.textContent = "Evaluando las reglas descargadas…";
         remote = await rules.request("exit_intent",Math.round(cart.total * 100));
         if (attempt !== exitSequence) return false;
         exitPending = false;
@@ -190,9 +198,22 @@ function cartRecoveryDecision(cents, referrer) {
       seen = true; store(seenKey,"1"); dialog.showModal(); (discount ? continueLink : email).focus();
       if (!remote) trace(decision.kind,"Intención de salida: decisión contextual simulada según el importe actual del carrito, no una compra ni un envío.","exit"); debug(); return true;
     }
-    document.getElementById("recovery-rules-refresh").onclick = () => {
-      rules.cancel(); cancelExit(); state.clear("teacher_refresh"); refreshActivation({force:true});
-      document.getElementById("recovery-lab-status").textContent = SHOP_CONFIG.activationUrl ? "Reglas solicitadas. Repite la salida para consultar el popup." : "Modo offline: snapshot y ofertas contextuales de demostración.";
+    rules.onChange(() => {refreshReminder(true); debug();});
+    document.getElementById("recovery-rules-refresh").onclick = async () => {
+      cancelExit();
+      const hint=document.getElementById("recovery-lab-status");
+      hint.textContent="Descargando reglas y audiencias desde GSheet…";
+      await rules.prepare(true);
+      refreshReminder(true); debug();
+      hint.textContent=!permitted() ? "Acepta la analítica para descargar la configuración." : !SHOP_CONFIG.activationUrl ?
+        "Modo offline: ofertas contextuales de demostración." : window.recoverySnapshotDebug?.rules_ready && window.recoverySnapshotDebug?.audiences_ready ?
+        "Reglas y audiencias listas. La evaluación es local. Reiniciar demostración permite otra salida automática." :
+        "Configuración o audiencias no disponibles. Consulta el diagnóstico; puedes volver a actualizar.";
+    };
+    document.getElementById("recovery-demo-reset").onclick = () => {
+      cancelExit(); seen=false;store(seenKey,null);engaged=false;
+      window.cartRecoveryDebug.exit=null;debug();
+      document.getElementById("recovery-lab-status").textContent="Demostración reiniciada sin consultas. Cierra el laboratorio, mueve el ratón dentro y sal por arriba.";
     };
     document.getElementById("recovery-exit-simulate").onclick = () => showExit(true);
     document.getElementById("recovery-exit-close").onclick = close;
@@ -221,7 +242,7 @@ function cartRecoveryDecision(cents, referrer) {
     writeCart = function (cart) { const result = originalWrite(cart); close(); if (!cart.length) { seen = false; store(seenKey,null); } synchronize(); return result; };
     const originalContext = renderPrivacyContext;
     renderPrivacyContext = function () { originalContext(); synchronize(); };
-    window.addEventListener("pageshow", () => synchronize());
+    window.addEventListener("pageshow", event => {synchronize();if(event.persisted)rules.prepare();});
     uiSync = synchronize;
     synchronize();
   });

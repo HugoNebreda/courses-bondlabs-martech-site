@@ -146,3 +146,15 @@ failures 30 seconds, and displays one experience. Popup cap is independent of
 cache TTL. Lab Update rules forces a fresh read after teacher edits. No polling,
 real order discounts, new events/SDKs or private fixture publication. Regenerate
 from the private source, preserve existing public work and smoke actual Pages.
+
+
+## D-044 current handoff: configuration download and local recovery
+
+Supersedes D043 recovery decision caching. This export REQUIRES the CURRENT four
+canonical .gs files, additive setupClassroom and a NEW version of the SAME Web App
+before publication. Previous deployment confirmation does not cover D044. Endpoint
+and 13 decision columns stay unchanged. Rules download once per five-minute validity;
+page entry refreshes received scoped audiences. Cart/exit evaluate locally without
+Google reads. Lab Update downloads both; Reset demonstration clears frequency only.
+Do not publish before the new backend confirmation. Preserve the current public
+site meanwhile. Do not export backend/private guides or claim production validation.
