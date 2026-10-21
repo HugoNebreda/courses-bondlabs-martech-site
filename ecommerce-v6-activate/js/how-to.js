@@ -10,7 +10,7 @@
     "Observa en Console la Traza docente, activa por defecto: el GET activation, surface=home y la decisión.",
     "Añade al carrito y espera la audiencia recibida en GSheet: prueba el recordatorio, Simular intención de salida y los enlaces vengodepartede del Laboratorio.",
     "Compra ≥300 EUR (p. ej. tres Carbon Pro) o realiza tres compras; revisa confirmation.",
-    "Con el profesor, edita descuento, textos/CTA, theme, layout o mínimo en ACTIVATION_DECISIONS; pulsa Actualizar reglas desde GSheet y repite la salida.",
+    "Con el profesor, edita las reglas en ACTIVATION_DECISIONS y pulsa Actualizar reglas desde GSheet para saltar la caché de cinco minutos; después repite la salida.",
     "Repite: decisión live frente a standard; comprueba el Sheet real."
   ],
   "teacher": [
@@ -18,7 +18,7 @@
     "AUDIENCE → DECISION REQUEST → DECISION RESPONSE → EXPERIENCE.",
     "Home: carrito > contenido por club > running. Confirmation: reconocimiento high_value; resto standard.",
     "La decisión remota puede dar standard; timeout/error nunca inventan oferta.",
-    "Recuperación live: AUDIENCES recibidas → reglas editables en GSheet → experiencia. URL y modo offline siguen siendo simulaciones contextuales. Ninguna oferta cambia precios/pedidos ni guarda emails."
+    "Una sola experiencia activa; consulta, caché y límite del popup son distintos. La traza muestra origen/caducidad y las ofertas siguen simuladas, sin cambiar precios/pedidos ni guardar emails."
   ]
 };
   const button = document.createElement("button");

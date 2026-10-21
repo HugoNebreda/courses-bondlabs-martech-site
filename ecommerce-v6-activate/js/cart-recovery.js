@@ -21,10 +21,10 @@ function cartRecoveryDecision(cents, referrer) {
     const referralKey = "mt_v6_recovery_referrer", seenKey = "mt_v6_exit_recovery_seen";
     const queryValues = new URLSearchParams(location.search).getAll("vengodepartede");
     let engaged = false, seen = false, returnFocus = null, lastCampaign = null;
-    const rules = window.MarTechSandbox.recoveryRules;
+    const rules = window.MarTechSandbox.recoveryRules, state = window.MarTechSandbox.activationState;
     const initialReminder = document.getElementById("activation-offer")?.innerHTML;
     let reminder = null, reminderKey = null, reminderSequence = 0, exitSequence = 0, exitPending = false;
-    let previousContext = rules.contextKey();
+    let previousContext = state.scope(), reminderExpiry = 0, renderedReminder = null, autoRetryAt = 0, autoRetryScope = null;
     const read = key => { try { return sessionStorage.getItem(key); } catch (error) { return null; } };
     const store = (key,value) => { try { if (value === null) sessionStorage.removeItem(key); else sessionStorage.setItem(key,value); } catch (error) {} };
     const permitted = () => readAnalyticsConsent() === "granted";
@@ -49,7 +49,7 @@ function cartRecoveryDecision(cents, referrer) {
     document.body.append(dialog);
     const email = document.getElementById("recovery-email"), form = document.getElementById("recovery-email-form"), status = document.getElementById("recovery-exit-status"), continueLink = document.getElementById("recovery-exit-continue");
     const section = document.createElement("section"); section.id = "recovery-lab";
-    section.innerHTML = '<h3>Tres casos de recuperación de carrito</h3><ol><li>Audiencia: añade productos y cambia de página. La activación existente puede recordarte terminar la compra.</li><li>Intención de salida: GSheet configura audiencia, importe mínimo, descuento simulado, textos, color y diseño. Sin servicio configurado: >300 €, 10 %; hasta 300 €, email ficticio.</li><li>Origen simulado: vengodepartede=unamigo (10 %), usainbolt (50 %) o hugo (80 %).</li></ol><p>Se requiere consentimiento analítico. En escritorio, mueve el cursor fuera por el borde superior; en móvil usa el botón. Es una señal de intención, no una confirmación de abandono.</p><button class="text-button" id="recovery-rules-refresh" type="button">Actualizar reglas desde GSheet</button><button class="text-button" id="recovery-exit-simulate" type="button">Simular intención de salida</button><p id="recovery-lab-status" role="status" aria-live="polite"></p><p id="recovery-origin-links"></p><p>Una campaña de origen tiene prioridad sobre las recuperaciones: no se apilan descuentos. Edita ACTIVATION_DECISIONS y usa Actualizar reglas o repite la salida. El modo live lee la última AUDIENCES de esta versión, ejercicio y perfil; puede tardar en recibir nuevos eventos. Las ofertas son simuladas y no cambian precios/pedidos. El email no crea un perfil ni envía correos.</p><pre id="recovery-debug"></pre>';
+    section.innerHTML = '<h3>Tres casos de recuperación de carrito</h3><ol><li>Audiencia: añade productos y cambia de página. La activación existente puede recordarte terminar la compra.</li><li>Intención de salida: GSheet configura audiencia, importe mínimo, descuento simulado, textos, color y diseño. Sin servicio configurado: >300 €, 10 %; hasta 300 €, email ficticio.</li><li>Origen simulado: vengodepartede=unamigo (10 %), usainbolt (50 %) o hugo (80 %).</li></ol><p>Se requiere consentimiento analítico. En escritorio, mueve el cursor fuera por el borde superior; en móvil usa el botón. Es una señal de intención, no una confirmación de abandono.</p><button class="text-button" id="recovery-rules-refresh" type="button">Actualizar reglas desde GSheet</button><button class="text-button" id="recovery-exit-simulate" type="button">Simular intención de salida</button><p id="recovery-lab-status" role="status" aria-live="polite"></p><p id="recovery-origin-links"></p><p>Una campaña de origen tiene prioridad sobre las recuperaciones: no se apilan descuentos. Edita ACTIVATION_DECISIONS y usa Actualizar reglas para saltar la caché. Las decisiones duran cinco minutos; cerrar el popup no reinicia su límite de aparición. El modo live lee la última AUDIENCES de esta versión, ejercicio y perfil; puede tardar en recibir nuevos eventos. Las ofertas son simuladas y no cambian precios/pedidos. El email no crea un perfil ni envía correos.</p><pre id="recovery-debug"></pre>';
     const lab = document.getElementById("how-to-dialog"); lab.querySelector("#how-to-close").before(section);
     const links = document.getElementById("recovery-origin-links");
     for (const [value,offer] of Object.entries(RECOVERY_REFERRALS)) {
@@ -59,7 +59,7 @@ function cartRecoveryDecision(cents, referrer) {
     function trace(action, explanation, surface) {
       if (typeof teachingTrace === "function") teachingTrace("EXPERIENCE",explanation,{source:"contextual_simulation",surface,action,eligible:true});
     }
-    function close() { email.value = ""; if (dialog.open) dialog.close(); }
+    function close() { email.value = ""; state.setView("exit",null); if (dialog.open) dialog.close(); }
     function cancelExit() { exitSequence++; exitPending = false; close(); }
     function currentCart() {
       if (!catalog || catalog.store.currency !== "EUR") return null;
@@ -75,6 +75,7 @@ function cartRecoveryDecision(cents, referrer) {
     function renderReminder() {
       const offer = document.getElementById("activation-offer");
       if (!SHOP_CONFIG.activationUrl) {
+        state.setView("cart_return",null);
         if (offer?.classList.contains("recovery-configured")) {
           offer.innerHTML = initialReminder; offer.classList.remove("recovery-configured"); delete offer.dataset.theme; delete offer.dataset.layout;
         }
@@ -82,47 +83,52 @@ function cartRecoveryDecision(cents, referrer) {
       }
       if (!offer) return;
       const eligible = permitted() && !referrer() && currentCart() && reminder?.eligible && ["catalog","cart"].includes(document.body.dataset.page);
-      offer.hidden = !eligible;
-      if (!eligible) return;
-      offer.replaceChildren();
-      const title = document.createElement("strong"), copy = document.createElement("p"), link = document.createElement("a"), note = document.createElement("small");
-      title.textContent = rules.presentation(reminder.config,"title"); copy.textContent = rules.presentation(reminder.config,"message");
-      link.className = "button"; link.href = "cart.html"; link.textContent = rules.presentation(reminder.config,"cta_label");
-      note.textContent = "Oferta simulada: el importe del checkout y del pedido no cambia.";
-      offer.append(title,copy);
-      if (reminder.config.discount_percent > 0) {
-        const percent = document.createElement("p"); percent.className = "recovery-discount";
-        percent.textContent = "Oferta simulada del " + reminder.config.discount_percent + " %"; offer.append(percent);
-      }
-      offer.append(link,note); rules.paint(offer,reminder.config);
-      for (const id of ["activation-running","activation-club"]) { const element = document.getElementById(id); if (element) element.hidden = true; }
+      state.setView("cart_return",{id:eligible ? reminder.decision_id : "standard",source:reminder?.cache?.hit ? "session_cache" : reminder?.source,priority:600,expires_at:eligible ? reminderExpiry : 1,
+        apply:visible => {
+          const hidden=!(visible && eligible); if (offer.hidden !== hidden) offer.hidden=hidden;
+          if (hidden) return;
+          const revision=JSON.stringify(reminder.config);
+          if (revision === renderedReminder) return;
+          renderedReminder=revision; offer.replaceChildren();
+          const title=document.createElement("strong"), copy=document.createElement("p"), link=document.createElement("a"), note=document.createElement("small");
+          title.textContent=rules.presentation(reminder.config,"title"); copy.textContent=rules.presentation(reminder.config,"message");
+          link.className="button"; link.href="cart.html"; link.textContent=rules.presentation(reminder.config,"cta_label");
+          note.textContent="Oferta simulada: el importe del checkout y del pedido no cambia."; offer.append(title,copy);
+          if (reminder.config.discount_percent > 0) {
+            const percent=document.createElement("p"); percent.className="recovery-discount";
+            percent.textContent="Oferta simulada del "+reminder.config.discount_percent+" %"; offer.append(percent);
+          }
+          offer.append(link,note); rules.paint(offer,reminder.config);
+        }});
     }
     function refreshReminder(force = false) {
       const cart = currentCart(), context = rules.contextKey();
-      const key = JSON.stringify({context,cents:cart?.cents ?? null,url:SHOP_CONFIG.activationUrl,projection:window.activationDebug?.input?.audiences || []});
-      if (!force && key === reminderKey) { renderReminder(); return; }
-      reminderKey = key; const sequence = ++reminderSequence; reminder = null;
+      const key = JSON.stringify({scope:state.scope(),cents:cart?.cents ?? null,url:SHOP_CONFIG.activationUrl});
+      if (!force && key === reminderKey && (reminderExpiry > Date.now() || window.cartRecoveryDebug.reminder?.source === "pending_sheet")) { renderReminder(); return; }
+      reminderKey = key; const sequence = ++reminderSequence; reminder = null; reminderExpiry = 0;
       window.cartRecoveryDebug.reminder = null; renderReminder();
       if (!SHOP_CONFIG.activationUrl || !permitted() || referrer() || !cart || !["catalog","cart"].includes(document.body.dataset.page)) return;
       window.cartRecoveryDebug.reminder = {source:"pending_sheet"}; debug();
       rules.request("cart_return",cart.cents).then(result => {
         if (sequence !== reminderSequence || context !== rules.contextKey()) return;
-        reminder = result; window.cartRecoveryDebug.reminder = result || {source:"live_unavailable_standard"};
+        reminder = result; reminderExpiry = result?.cache?.expires_at || Date.now()+30000; window.cartRecoveryDebug.reminder = result || {source:"live_unavailable_standard"};
+        state.noteRecovery(result);
         renderReminder(); traceSheet(result,"cart_return"); debug();
       });
     }
-    const originalActivationRender = renderActivation;
-    renderActivation = function () { const result = originalActivationRender(); refreshReminder(); return result; };
+    const originalActivationRefresh = refreshActivation;
+    refreshActivation = function (options = {}) { const result = originalActivationRefresh(options); refreshReminder(!!options.force); return result; };
     function debug() { document.getElementById("recovery-debug").textContent = JSON.stringify(window.cartRecoveryDebug,null,2); }
     function synchronize() {
-      const context = rules.contextKey();
+      state.sync();
+      const context = state.scope();
       if (context !== previousContext) { rules.cancel(); cancelExit(); previousContext = context; }
       if (!permitted()) { rules.cancel(); cancelExit(); reminder = null; window.cartRecoveryDebug.exit = null; store(referralKey,null); store(seenKey,null); seen = false; close(); }
       if (!readCart().length) { seen = false; store(seenKey,null); }
       const origin = referrer(), allowedPage = document.body.dataset.page !== "confirmation";
-      campaign.hidden = !origin || !allowedPage;
+      state.setView("campaign",{id:origin || "standard",priority:900,expires_at:origin && allowedPage ? null : 1,apply:visible => { const hidden=!(visible && origin && allowedPage); if(campaign.hidden !== hidden)campaign.hidden=hidden; }});
       window.cartRecoveryDebug.campaign = origin && allowedPage ? cartRecoveryDecision(0,origin) : null;
-      if (!campaign.hidden) {
+      if (origin && allowedPage) {
         const offer = RECOVERY_REFERRALS[origin];
         document.getElementById("recovery-campaign-title").textContent = "Obtén un " + offer.percent + " % de descuento";
         document.getElementById("recovery-campaign-copy").textContent = "Vienes de parte de " + offer.name + ". Continúa tu compra con esta oferta simulada.";
@@ -137,6 +143,7 @@ function cartRecoveryDecision(cents, referrer) {
     }
     async function showExit(simulated = false) {
       const hint = document.getElementById("recovery-lab-status");
+      if (!simulated && autoRetryScope === state.scope() && autoRetryAt > Date.now()) return false;
       if (!permitted()) { if (simulated) hint.textContent = "Acepta la analítica en Gestionar consentimiento para probar la activación."; return false; }
       if (referrer()) { if (simulated) hint.textContent = "Hay una campaña de origen activa. Usa Quitar campaña para probar el popup."; return false; }
       if (!catalog || document.body.dataset.page === "confirmation" || document.querySelector("#payment-form button:disabled")) return false;
@@ -147,6 +154,7 @@ function cartRecoveryDecision(cents, referrer) {
       const context = rules.contextKey(), attempt = ++exitSequence;
       let remote = null;
       if (SHOP_CONFIG.activationUrl) {
+        if (!simulated) { autoRetryScope=state.scope(); autoRetryAt=Date.now()+30000; }
         exitPending = true; window.cartRecoveryDebug.exit = {source:"pending_sheet"}; debug(); hint.textContent = "Consultando las reglas de GSheet…";
         remote = await rules.request("exit_intent",Math.round(cart.total * 100));
         if (attempt !== exitSequence) return false;
@@ -160,6 +168,9 @@ function cartRecoveryDecision(cents, referrer) {
       }
       const decision = remote ? {kind:remote.action,percent:remote.config.discount_percent} : cartRecoveryDecision(Math.round(cart.total * 100),null);
       window.cartRecoveryDebug.exit = {...(remote || {}),...decision,trigger:simulated ? "lab_simulation" : "exit_intent",cart_cents:Math.round(cart.total * 100)};
+      const claimed=state.setView("exit",{id:remote?.decision_id || decision.kind,source:remote?.cache?.hit ? "session_cache" : remote?.source || "contextual_simulation",priority:800,expires_at:remote?.cache?.expires_at || Date.now()+300000,
+        apply:visible=>{if(!visible && dialog.open)dialog.close();}});
+      if (!claimed) return false;
       returnFocus = simulated ? document.getElementById("how-to-open") : document.activeElement;
       if (simulated && lab.open) lab.close();
       const discount = decision.kind === "exit_discount";
@@ -180,14 +191,14 @@ function cartRecoveryDecision(cents, referrer) {
       if (!remote) trace(decision.kind,"Intención de salida: decisión contextual simulada según el importe actual del carrito, no una compra ni un envío.","exit"); debug(); return true;
     }
     document.getElementById("recovery-rules-refresh").onclick = () => {
-      rules.cancel(); cancelExit(); refreshReminder(true);
+      rules.cancel(); cancelExit(); state.clear("teacher_refresh"); refreshActivation({force:true});
       document.getElementById("recovery-lab-status").textContent = SHOP_CONFIG.activationUrl ? "Reglas solicitadas. Repite la salida para consultar el popup." : "Modo offline: snapshot y ofertas contextuales de demostración.";
     };
     document.getElementById("recovery-exit-simulate").onclick = () => showExit(true);
     document.getElementById("recovery-exit-close").onclick = close;
     continueLink.onclick = close;
-    dialog.addEventListener("cancel", () => { email.value = ""; });
-    dialog.addEventListener("close", () => { if (dialog.open) return; email.value = ""; if (returnFocus?.isConnected) returnFocus.focus(); });
+    dialog.addEventListener("cancel", () => { email.value = ""; state.setView("exit",null); });
+    dialog.addEventListener("close", () => { if (dialog.open) return; state.setView("exit",null); email.value = ""; if (returnFocus?.isConnected) returnFocus.focus(); });
     dialog.addEventListener("keydown", event => {
       if (event.key !== "Tab") return;
       const fields = [...dialog.querySelectorAll("a[href], input, button")].filter(field => !field.disabled && field.getClientRects().length);

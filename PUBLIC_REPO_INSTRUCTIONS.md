@@ -136,3 +136,13 @@ See the PRIVATE V6_SHEET_ACTIVATION_GUIDE for column edits and final human smoke
 Do not publish the private guide, fixture CSVs or backend. D-039 manual imports
 remain a separate checkpoint; do not infer deployment confirmation from earlier
 messages predating this contract. Keep live failure standard and offline explicit.
+
+## D-043 V6 activation lifecycle correction
+
+This frontend-only correction reuses the existing .gs/read schema/endpoint. No
+new Google redeployment is required for D-043. One consented per-tab controller
+serializes/coalesces reads, caches positive decisions 300 seconds and no-offer/
+failures 30 seconds, and displays one experience. Popup cap is independent of
+cache TTL. Lab Update rules forces a fresh read after teacher edits. No polling,
+real order discounts, new events/SDKs or private fixture publication. Regenerate
+from the private source, preserve existing public work and smoke actual Pages.

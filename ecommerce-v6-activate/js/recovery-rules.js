@@ -36,23 +36,41 @@ function validRecoveryPresentation(config, action) {
     if (!result.eligible && (result.action !== null || result.config !== null)) return;
     complete(result.request_id, {...result, source:"live_sheet"});
   };
+  function validDecision(result,trigger,cents) {
+    return !!result && result.contract === "recovery_v1" && result.trigger === trigger &&
+      ["home","cart","product","checkout"].includes(result.surface) && typeof result.eligible === "boolean" &&
+      Array.isArray(result.audiences) && result.audiences.every(value => ["cart_abandoner","high_value","running_interest"].includes(value)) &&
+      typeof result.reason === "string" && result.reason.length <= 80 && (!result.eligible ? result.action === null && result.config === null :
+        /^decision_[a-z0-9_]+$/.test(result.decision_id || "") &&
+        (trigger === "cart_return" ? result.action === "cart_recovery_reminder" : ["exit_discount","exit_email"].includes(result.action)) &&
+        validRecoveryPresentation(result.config,result.action) && Math.round(result.config.min_cart_total * 100) <= cents);
+  }
   function request(trigger, cents) {
     const signature = contextKey(), identity = signature ? analyticsIdentity() : null;
     if (!SHOP_CONFIG.activationUrl || !identity || !Number.isSafeInteger(cents) || cents <= 0 || cents > 999999999 ||
-        !["home","cart","product","checkout"].includes(surface())) return Promise.resolve(null);
-    return new Promise(resolve => {
+        !["home","cart","product","checkout"].includes(surface()) || !["cart_return","exit_intent"].includes(trigger)) return Promise.resolve(null);
+    const state = window.MarTechSandbox.activationState;
+    const perform = abort => new Promise(resolve => {
       const id = "rec_" + (++sequence), script = document.createElement("script");
-      const state = {resolve,script,signature,trigger,surface:surface(),cents};
-      pending.set(id,state);
-      state.timer = setTimeout(() => complete(id,null),5000);
+      const read = {resolve,script,signature,trigger,surface:surface(),cents};
+      pending.set(id,read); if (abort) abort(() => complete(id,null));
+      read.timer = setTimeout(() => complete(id,null),5000);
       try {
         const url = new URL(SHOP_CONFIG.activationUrl,location.href);
         if (!["https:","http:"].includes(url.protocol)) throw Error("Invalid activation URL");
-        const params = {operation:"recovery_activation",request_id:id,trigger,surface:state.surface,
+        const params = {operation:"recovery_activation",request_id:id,trigger,surface:read.surface,
           sandbox_version:"v6-activate",...identity,cart_cents:String(cents)};
         for (const [key,value] of Object.entries(params)) if (value !== null) url.searchParams.set(key,value);
         script.src = url.href; script.onerror = () => complete(id,null); document.head.append(script);
       } catch (error) { complete(id,null); }
+    });
+    if (!state) return perform();
+    // Current backend applies the same trigger rules on all allowed shop surfaces.
+    // Cached answers keep their original response surface/provenance unchanged.
+    return state.lookup("recovery",JSON.stringify({trigger,cents}),perform,value=>validDecision(value,trigger,cents)).then(answer => {
+      if (answer.cancelled) return null;
+      const cache = {hit:answer.from_cache,expires_at:answer.expires_at};
+      return answer.value ? {...answer.value,cache} : {source:"live_unavailable_standard",eligible:false,reason:"service_unavailable",cache};
     });
   }
   function presentation(config, field) {
